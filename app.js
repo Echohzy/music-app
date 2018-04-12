@@ -4,11 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var routes = require('./routes/index');
 var api = require('./routes/api');
-
+var Bundler = require('parcel-bundler');
 var app = express();
+var config = require('./parcel/config');
+var bundler = new Bundler(config.file, config.options);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,6 +23,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(bundler.middleware());
 app.use('/', routes);
 app.use('/api', api);
 
