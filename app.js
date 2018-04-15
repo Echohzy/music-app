@@ -10,7 +10,7 @@ var Bundler = require('parcel-bundler');
 var app = express();
 var config = require('./parcel/config');
 var bundler = new Bundler(config.file, config.options);
-
+// bundler.addPackager('vue', require('vue/dist/vue.common'));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
