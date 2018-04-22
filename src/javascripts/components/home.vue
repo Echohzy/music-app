@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Header />
     <Slider :slider="slider"/>
   </div>
 </template>
@@ -23,7 +22,12 @@ export default {
       return res.data;
     }).then((data)=>{
       this.radioList = data.radioList,
-      this.slider = data.slider;
+      this.slider = data.slider.map((s)=>{
+        return {
+          link: s.linkUrl,
+          pic: s.picUrl
+        };
+      });
     },function(error){
       alert(error);
     })

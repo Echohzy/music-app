@@ -1,12 +1,19 @@
 <template>
   <div id="toplist-container">
     <ul class="list">
-      <li v-for="item in list">
+      <li v-for="item in list" class="list-item">
         <div class="img-block">
           <img :src="item.picUrl" />
         </div>
         <div class="content-block">
           <h3>{{item.topTitle}}</h3>
+          <ul class="song-list">
+            <li v-for="(s, index) in item.songList" :title="s.songname">
+              <span class="number">{{index+1}}</span>
+              <span class="name">{{s.songname}}</span>
+              <span class="singer">{{s.singername}}</span>
+            </li>
+          </ul>
         </div>
       </li>
     </ul>
@@ -33,5 +40,41 @@
   };
 </script>
 <style scoped>
-  
+  #toplist-container{
+    padding: 10px;
+  }
+  .list-item{
+    display: flex;
+    background: #fdfdfd;
+  }
+  .list-item + .list-item{
+    margin-top: 10px;
+  }
+  .list-item .img-block{
+    height: 100px;
+    width: 100px;
+    overflow: hidden;
+  }
+  .img-block img{
+    height: 100px;
+    width: 100px;
+  }
+  .content-block{
+    padding: 10px;
+    flex: 1;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  .content-block h3{
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  .content-block li{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+  }
+  .content-block li .number, .content-block li .singer{
+    color: #99A1B4;
+  }
 </style>

@@ -15,13 +15,18 @@
     display: flex;
     height: 40px;
     line-height: 40px;
-    background: #fff;
+    background: #fdfdfd;
     
   }
   .tab-button{
     flex: 1;
     font-size: 16px;
     text-align: center;
-    
+    border-box: border-content;
+    color:#4c5475;
+  }
+  .tab-button.router-link-active{
+    color: #818FAF;
+    border-bottom: 2px solid #818FAF;
   }
 </style>
