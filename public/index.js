@@ -10193,7 +10193,7 @@ if (module.hot) {
   })();
 }
 },{"vueify/lib/insert-css":25,"./header.vue":21,"./tabs.vue":22,"vue-hot-reload-api":23,"vue":13}],20:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#slider-container[data-v-3e6b9b46]{\n  height: 200px;\n  position: relative;\n}\n.slider-content[data-v-3e6b9b46]{\n  display: flex;\n  float: left;\n}\n.slider-item[data-v-3e6b9b46]{\n  height: 200px;\n  width: 100vw;\n}\n.slider-item img[data-v-3e6b9b46]{\n  height: 200px;\n}\n.page-content[data-v-3e6b9b46]{\n  position: absolute;\n  width: 100%;\n  text-align: center;\n  bottom: 20px;\n}\n.page-button[data-v-3e6b9b46]{\n  display: inline-block;\n  height: 10px;\n  width: 10px;\n  border-radius: 5px;\n  background: rgba(255, 255,255, 0.8); \n}\n.page-button + .page-button[data-v-3e6b9b46]{\n  margin-left: 6px;\n}");(function () {
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#slider-container[data-v-3e6b9b46]{\n  position: relative;\n}\n.slider-content[data-v-3e6b9b46]{\n  display: flex;\n  transition: all 0.2s ease;\n}\n.slider-item[data-v-3e6b9b46]{\n  width: 100vw;\n}\n.slider-item img[data-v-3e6b9b46]{\n  width: 100vw;\n}\n.page-content[data-v-3e6b9b46]{\n  position: absolute;\n  width: 100%;\n  text-align: center;\n  bottom: 20px;\n}\n.page-button[data-v-3e6b9b46]{\n  display: inline-block;\n  height: 10px;\n  width: 10px;\n  border-radius: 5px;\n  background: rgba(255, 255,255, 0.8); \n}\n.page-button + .page-button[data-v-3e6b9b46]{\n  margin-left: 6px;\n}");(function () {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
@@ -10238,7 +10238,7 @@ __vue__options__.render = function render() {
     return _c('li', { staticClass: "slider-item" }, [_c('a', { attrs: { "href": s.link } }, [_c('img', { attrs: { "src": s.pic } })])]);
   })), _vm._v(" "), _c('div', { staticClass: "page-content" }, _vm._l(_vm.totalPages, function (n) {
     return _c('span', { staticClass: "page-button", on: { "click": function click($event) {
-          _vm.changePage(n);
+          _vm.changePage(n - 1);
         } } });
   }))]);
 };
@@ -11954,7 +11954,7 @@ if (module.hot) {
   })();
 }
 },{"vueify/lib/insert-css":25,"./slider.vue":20,"axios":24,"vue-hot-reload-api":23,"vue":13}],9:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#toplist-container[data-v-26b8c1de]{\n  padding: 10px;\n}\n.list-item[data-v-26b8c1de]{\n  display: flex;\n  background: #fdfdfd;\n}\n.list-item + .list-item[data-v-26b8c1de]{\n  margin-top: 10px;\n}\n.list-item .img-block[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n  overflow: hidden;\n}\n.img-block img[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n}\n.content-block[data-v-26b8c1de]{\n  padding: 10px;\n  flex: 1;\n  overflow: hidden;\n  box-sizing: border-box;\n}\n.content-block h3[data-v-26b8c1de]{\n  font-size: 16px;\n  margin-bottom: 5px;\n}\n.content-block li[data-v-26b8c1de]{\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow:ellipsis;\n}\n.content-block li .number[data-v-26b8c1de], .content-block li .singer[data-v-26b8c1de]{\n  color: #99A1B4;\n}");(function () {
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#toplist-container[data-v-26b8c1de]{\n  padding: 10px;\n}\n.list-item[data-v-26b8c1de]{\n  display: flex;\n  background: #fdfdfd;\n  box-shadow: 0 0 10px rgba(0,0,0,0.2);\n}\n.list-item + .list-item[data-v-26b8c1de]{\n  margin-top: 10px;\n}\n.list-item .img-block[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n  overflow: hidden;\n}\n.img-block img[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n}\n.content-block[data-v-26b8c1de]{\n  padding: 10px;\n  flex: 1;\n  overflow: hidden;\n  box-sizing: border-box;\n}\n.content-block h3[data-v-26b8c1de]{\n  font-size: 16px;\n  margin-bottom: 5px;\n}\n.content-block li[data-v-26b8c1de]{\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow:ellipsis;\n}\n.content-block li .number[data-v-26b8c1de], .content-block li .singer[data-v-26b8c1de]{\n  color: #99A1B4;\n}");(function () {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
@@ -12013,7 +12013,7 @@ if (module.hot) {
     if (!module.hot.data) {
       hotAPI.createRecord("data-v-26b8c1de", __vue__options__);
     } else {
-      hotAPI.reload("data-v-26b8c1de", __vue__options__);
+      hotAPI.rerender("data-v-26b8c1de", __vue__options__);
     }
   })();
 }

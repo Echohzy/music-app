@@ -8,7 +8,7 @@
       </li>
     </ul>
     <div class="page-content">
-      <span v-for="n in totalPages" v-on:click="changePage(n)" class="page-button"></span>
+      <span v-for="n in totalPages" v-on:click="changePage(n-1)" class="page-button"></span>
     </div>
   </div>
 </template>
@@ -36,7 +36,7 @@
       }
     },
     methods:{
-      changePage: function(page){
+      changePage: function(page){ 
         this.currentPage = page;
       }  
     }
@@ -44,19 +44,17 @@
 </script>
 <style scoped>
   #slider-container{
-    height: 200px;
     position: relative;
   }
   .slider-content{
     display: flex;
-    float: left;
+    transition: all 0.2s ease;
   }
   .slider-item{
-    height: 200px;
     width: 100vw;
   }
   .slider-item img{
-    height: 200px;
+    width: 100vw;
   }
   .page-content{
     position: absolute;
