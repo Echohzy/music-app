@@ -68,7 +68,7 @@ require = (function (modules, cache, entry) {
 
   // Override the current require with this new one
   return newRequire;
-})({9:[function(require,module,exports) {
+})({13:[function(require,module,exports) {
 var global = (1,eval)("this");
 'use strict';
 
@@ -7349,7 +7349,7 @@ if (inBrowser) {
 /*  */
 
 exports.default = Vue;
-},{}],11:[function(require,module,exports) {
+},{}],15:[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9802,7 +9802,7 @@ if (inBrowser && window.Vue) {
 }
 
 exports.default = VueRouter;
-},{}],20:[function(require,module,exports) {
+},{}],25:[function(require,module,exports) {
 var inserted = exports.cache = {}
 
 function noop () {}
@@ -9827,7 +9827,7 @@ exports.insert = function (css) {
   }
 }
 
-},{}],18:[function(require,module,exports) {
+},{}],23:[function(require,module,exports) {
 var Vue // late bind
 var version
 var map = (window.__VUE_HOT_MAP__ = Object.create(null))
@@ -10069,7 +10069,7 @@ exports.reload = tryWrap(function (id, options) {
   })
 })
 
-},{}],16:[function(require,module,exports) {
+},{}],20:[function(require,module,exports) {
 var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".header[data-v-725b4ef2]{\n  height: 44px;\n  background: rgba(41,42, 45, 0.8);\n  display: flex;\n  align-items: center;\n}\nh1[data-v-725b4ef2]{\n  flex: 1;\n  font-size: 20px;\n  color: #e2e2e3;\n}");(function () {
   "use strict";
 
@@ -10106,7 +10106,93 @@ if (module.hot) {
     }
   })();
 }
-},{"vueify/lib/insert-css":20,"vue-hot-reload-api":18,"vue":9}],17:[function(require,module,exports) {
+},{"vueify/lib/insert-css":25,"vue-hot-reload-api":23,"vue":13}],22:[function(require,module,exports) {
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".tabs-container[data-v-14f86ea3]{\n  display: flex;\n  height: 40px;\n  line-height: 40px;\n  background: #fff;\n  \n}\n.tab-button[data-v-14f86ea3]{\n  flex: 1;\n  font-size: 16px;\n  text-align: center;\n  \n}");(function () {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    name: "Tabs"
+  };
+})();
+if (module.exports.__esModule) module.exports = module.exports.default;
+var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
+if (__vue__options__.functional) {
+  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
+}
+__vue__options__.render = function render() {
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "tabs-container" }, [_c('router-link', { staticClass: "tab-button", attrs: { "to": "/home" } }, [_vm._v("首页")]), _vm._v(" "), _c('router-link', { staticClass: "tab-button", attrs: { "to": "/toplist" } }, [_vm._v("榜单")]), _vm._v(" "), _c('router-link', { staticClass: "tab-button", attrs: { "to": "/search" } }, [_vm._v("搜索")])], 1);
+};
+__vue__options__.staticRenderFns = [];
+__vue__options__._scopeId = "data-v-14f86ea3";
+if (module.hot) {
+  (function () {
+    var hotAPI = require("vue-hot-reload-api");
+    hotAPI.install(require("vue"), true);
+    if (!hotAPI.compatible) return;
+    module.hot.accept();
+    module.hot.dispose(__vueify_style_dispose__);
+    if (!module.hot.data) {
+      hotAPI.createRecord("data-v-14f86ea3", __vue__options__);
+    } else {
+      hotAPI.rerender("data-v-14f86ea3", __vue__options__);
+    }
+  })();
+}
+},{"vueify/lib/insert-css":25,"vue-hot-reload-api":23,"vue":13}],5:[function(require,module,exports) {
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("*{\n  margin: 0;\n  padding: 0;\n}");(function () {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _header = require('./header.vue');
+
+  var _header2 = _interopRequireDefault(_header);
+
+  var _tabs = require('./tabs.vue');
+
+  var _tabs2 = _interopRequireDefault(_tabs);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : { default: obj };
+  }
+
+  exports.default = {
+    name: "App",
+    components: {
+      Header: _header2.default,
+      Tabs: _tabs2.default
+    }
+  };
+})();
+if (module.exports.__esModule) module.exports = module.exports.default;
+var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
+if (__vue__options__.functional) {
+  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
+}
+__vue__options__.render = function render() {
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { attrs: { "id": "app" } }, [_c('Header'), _vm._v(" "), _c('Tabs'), _vm._v(" "), _c('router-view', { staticClass: "view" })], 1);
+};
+__vue__options__.staticRenderFns = [];
+if (module.hot) {
+  (function () {
+    var hotAPI = require("vue-hot-reload-api");
+    hotAPI.install(require("vue"), true);
+    if (!hotAPI.compatible) return;
+    module.hot.accept();
+    module.hot.dispose(__vueify_style_dispose__);
+    if (!module.hot.data) {
+      hotAPI.createRecord("data-v-ff29d1e8", __vue__options__);
+    } else {
+      hotAPI.reload("data-v-ff29d1e8", __vue__options__);
+    }
+  })();
+}
+},{"vueify/lib/insert-css":25,"./header.vue":20,"./tabs.vue":22,"vue-hot-reload-api":23,"vue":13}],21:[function(require,module,exports) {
 var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#slider-container[data-v-3e6b9b46]{\n  display: flex;\n}");(function () {
   "use strict";
 
@@ -10150,7 +10236,7 @@ if (module.hot) {
     }
   })();
 }
-},{"vueify/lib/insert-css":20,"vue-hot-reload-api":18,"vue":9}],25:[function(require,module,exports) {
+},{"vueify/lib/insert-css":25,"vue-hot-reload-api":23,"vue":13}],30:[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -10163,7 +10249,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],34:[function(require,module,exports) {
+},{}],39:[function(require,module,exports) {
 /*!
  * Determine if an object is a Buffer
  *
@@ -10186,7 +10272,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],23:[function(require,module,exports) {
+},{}],28:[function(require,module,exports) {
 'use strict';
 
 var bind = require('./helpers/bind');
@@ -10491,7 +10577,7 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":25,"is-buffer":34}],32:[function(require,module,exports) {
+},{"./helpers/bind":30,"is-buffer":39}],37:[function(require,module,exports) {
 'use strict';
 
 var utils = require('../utils');
@@ -10505,7 +10591,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":23}],47:[function(require,module,exports) {
+},{"../utils":28}],52:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -10528,7 +10614,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],44:[function(require,module,exports) {
+},{}],49:[function(require,module,exports) {
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -10548,7 +10634,7 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":47}],40:[function(require,module,exports) {
+},{"./enhanceError":52}],45:[function(require,module,exports) {
 'use strict';
 
 var createError = require('./createError');
@@ -10576,7 +10662,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":44}],41:[function(require,module,exports) {
+},{"./createError":49}],46:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -10644,7 +10730,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":23}],42:[function(require,module,exports) {
+},{"./../utils":28}],47:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -10699,7 +10785,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":23}],43:[function(require,module,exports) {
+},{"./../utils":28}],48:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -10769,7 +10855,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":23}],45:[function(require,module,exports) {
+},{"./../utils":28}],50:[function(require,module,exports) {
 'use strict';
 
 // btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
@@ -10807,7 +10893,7 @@ function btoa(input) {
 
 module.exports = btoa;
 
-},{}],46:[function(require,module,exports) {
+},{}],51:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -10862,7 +10948,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":23}],33:[function(require,module,exports) {
+},{"./../utils":28}],38:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -11037,7 +11123,7 @@ module.exports = function xhrAdapter(config) {
     request.send(requestData);
   });
 };
-},{"./../utils":23,"./../core/settle":40,"./../helpers/buildURL":41,"./../helpers/parseHeaders":42,"./../helpers/isURLSameOrigin":43,"../core/createError":44,"./../helpers/btoa":45,"./../helpers/cookies":46}],31:[function(require,module,exports) {
+},{"./../utils":28,"./../core/settle":45,"./../helpers/buildURL":46,"./../helpers/parseHeaders":47,"./../helpers/isURLSameOrigin":48,"../core/createError":49,"./../helpers/btoa":50,"./../helpers/cookies":51}],36:[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {};
@@ -11224,7 +11310,7 @@ process.chdir = function (dir) {
 process.umask = function () {
     return 0;
 };
-},{}],24:[function(require,module,exports) {
+},{}],29:[function(require,module,exports) {
 var process = require("process");
 'use strict';
 
@@ -11323,7 +11409,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":23,"./helpers/normalizeHeaderName":32,"./adapters/xhr":33,"./adapters/http":33,"process":31}],35:[function(require,module,exports) {
+},{"./utils":28,"./helpers/normalizeHeaderName":37,"./adapters/xhr":38,"./adapters/http":38,"process":36}],40:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -11377,7 +11463,7 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":23}],37:[function(require,module,exports) {
+},{"./../utils":28}],42:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -11399,14 +11485,14 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":23}],29:[function(require,module,exports) {
+},{"./../utils":28}],34:[function(require,module,exports) {
 'use strict';
 
 module.exports = function isCancel(value) {
   return !!(value && value.__CANCEL__);
 };
 
-},{}],38:[function(require,module,exports) {
+},{}],43:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -11422,7 +11508,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],39:[function(require,module,exports) {
+},{}],44:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -11438,7 +11524,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],36:[function(require,module,exports) {
+},{}],41:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -11526,7 +11612,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"./../utils":23,"./transformData":37,"../cancel/isCancel":29,"../defaults":24,"./../helpers/isAbsoluteURL":38,"./../helpers/combineURLs":39}],26:[function(require,module,exports) {
+},{"./../utils":28,"./transformData":42,"../cancel/isCancel":34,"../defaults":29,"./../helpers/isAbsoluteURL":43,"./../helpers/combineURLs":44}],32:[function(require,module,exports) {
 'use strict';
 
 var defaults = require('./../defaults');
@@ -11607,7 +11693,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"./../defaults":24,"./../utils":23,"./InterceptorManager":35,"./dispatchRequest":36}],27:[function(require,module,exports) {
+},{"./../defaults":29,"./../utils":28,"./InterceptorManager":40,"./dispatchRequest":41}],31:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -11628,7 +11714,7 @@ Cancel.prototype.__CANCEL__ = true;
 
 module.exports = Cancel;
 
-},{}],28:[function(require,module,exports) {
+},{}],33:[function(require,module,exports) {
 'use strict';
 
 var Cancel = require('./Cancel');
@@ -11687,7 +11773,7 @@ CancelToken.source = function source() {
 
 module.exports = CancelToken;
 
-},{"./Cancel":27}],30:[function(require,module,exports) {
+},{"./Cancel":31}],35:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -11716,7 +11802,7 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],22:[function(require,module,exports) {
+},{}],27:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./utils');
@@ -11770,19 +11856,15 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./utils":23,"./helpers/bind":25,"./core/Axios":26,"./defaults":24,"./cancel/Cancel":27,"./cancel/CancelToken":28,"./cancel/isCancel":29,"./helpers/spread":30}],19:[function(require,module,exports) {
+},{"./utils":28,"./helpers/bind":30,"./core/Axios":32,"./defaults":29,"./cancel/Cancel":31,"./cancel/CancelToken":33,"./cancel/isCancel":34,"./helpers/spread":35}],24:[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":22}],5:[function(require,module,exports) {
+},{"./lib/axios":27}],7:[function(require,module,exports) {
 var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("h1[data-v-2d019784]{\n  font-size: 20px;\n}");(function () {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-
-  var _header = require('./header.vue');
-
-  var _header2 = _interopRequireDefault(_header);
 
   var _slider = require('./slider.vue');
 
@@ -11799,7 +11881,6 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("h1[data-
   exports.default = {
     name: "Home",
     components: {
-      Header: _header2.default,
       Slider: _slider2.default
     },
     data: function data() {
@@ -11845,7 +11926,7 @@ if (module.hot) {
     }
   })();
 }
-},{"vueify/lib/insert-css":20,"./header.vue":16,"./slider.vue":17,"axios":19,"vue-hot-reload-api":18,"vue":9}],7:[function(require,module,exports) {
+},{"vueify/lib/insert-css":25,"./slider.vue":21,"axios":24,"vue-hot-reload-api":23,"vue":13}],9:[function(require,module,exports) {
 ;(function () {
   "use strict";
 
@@ -11906,7 +11987,70 @@ if (module.hot) {
     }
   })();
 }
-},{"axios":19,"vue-hot-reload-api":18,"vue":9}],21:[function(require,module,exports) {
+},{"axios":24,"vue-hot-reload-api":23,"vue":13}],11:[function(require,module,exports) {
+;(function () {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _axios = require('axios');
+
+  var _axios2 = _interopRequireDefault(_axios);
+
+  var _vueRouter = require('vue-router');
+
+  var _vueRouter2 = _interopRequireDefault(_vueRouter);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : { default: obj };
+  }
+
+  exports.default = {
+    name: "Search",
+    data: function data() {
+      return {
+        hotKeys: []
+      };
+    },
+    created: function created() {
+      var _this = this;
+
+      _axios2.default.get("/api/hot_key").then(function (res) {
+        return res.data;
+      }).then(function (data) {
+        _this.hotKeys = data && data.data && data.data.hotkey;
+      }, function (error) {
+        console.log(error);
+      });
+    }
+  };
+})();
+if (module.exports.__esModule) module.exports = module.exports.default;
+var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
+if (__vue__options__.functional) {
+  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
+}
+__vue__options__.render = function render() {
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "search-container" });
+};
+__vue__options__.staticRenderFns = [];
+__vue__options__._scopeId = "data-v-5bb866e6";
+if (module.hot) {
+  (function () {
+    var hotAPI = require("vue-hot-reload-api");
+    hotAPI.install(require("vue"), true);
+    if (!hotAPI.compatible) return;
+    module.hot.accept();
+    if (!module.hot.data) {
+      hotAPI.createRecord("data-v-5bb866e6", __vue__options__);
+    } else {
+      hotAPI.reload("data-v-5bb866e6", __vue__options__);
+    }
+  })();
+}
+},{"axios":24,"vue-router":15,"vue-hot-reload-api":23,"vue":13}],26:[function(require,module,exports) {
 var bundleURL = null;
 function getBundleURLCached() {
   if (!bundleURL) {
@@ -11936,7 +12080,7 @@ function getBaseURL(url) {
 
 exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
-},{}],14:[function(require,module,exports) {
+},{}],18:[function(require,module,exports) {
 var bundle = require('./bundle-url');
 
 function updateLink(link) {
@@ -11967,13 +12111,13 @@ function reloadCSS() {
 }
 
 module.exports = reloadCSS;
-},{"./bundle-url":21}],3:[function(require,module,exports) {
+},{"./bundle-url":26}],3:[function(require,module,exports) {
 
         var reloadCSS = require('_css_loader');
         module.hot.dispose(reloadCSS);
         module.hot.accept(reloadCSS);
       
-},{"_css_loader":14}],1:[function(require,module,exports) {
+},{"_css_loader":18}],1:[function(require,module,exports) {
 'use strict';
 
 var _vue = require('vue');
@@ -11984,6 +12128,10 @@ var _vueRouter = require('vue-router');
 
 var _vueRouter2 = _interopRequireDefault(_vueRouter);
 
+var _app = require('./components/app.vue');
+
+var _app2 = _interopRequireDefault(_app);
+
 var _home = require('./components/home.vue');
 
 var _home2 = _interopRequireDefault(_home);
@@ -11992,30 +12140,30 @@ var _toplist = require('./components/toplist.vue');
 
 var _toplist2 = _interopRequireDefault(_toplist);
 
+var _search = require('./components/search.vue');
+
+var _search2 = _interopRequireDefault(_search);
+
 require('../stylesheets/style.scss');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var routes = {
-  '/': _home2.default,
-  '/toplist': _toplist2.default
-}; // import Vue from 'vue/dist/vue.common';
+_vue2.default.use(_vueRouter2.default);
 
+var routes = [{ path: "/home", component: _home2.default }, { path: "/toplist", component: _toplist2.default }, { path: "/search", component: _search2.default }];
+
+var router = new _vueRouter2.default({
+  mode: 'history',
+  routes: routes
+});
 
 new _vue2.default({
-  data: {
-    currentRoute: window.location.pathname
-  },
-  computed: {
-    ViewComponent: function ViewComponent() {
-      return routes[this.currentRoute] || NotFound;
-    }
-  },
+  router: router,
   render: function render(h) {
-    return h(this.ViewComponent);
+    return h(_app2.default);
   }
 }).$mount('#app');
-},{"vue":9,"vue-router":11,"./components/home.vue":5,"./components/toplist.vue":7,"../stylesheets/style.scss":3}],0:[function(require,module,exports) {
+},{"vue":13,"vue-router":15,"./components/app.vue":5,"./components/home.vue":7,"./components/toplist.vue":9,"./components/search.vue":11,"../stylesheets/style.scss":3}],0:[function(require,module,exports) {
 var global = (1, eval)('this');
 var OldModule = module.bundle.Module;
 function Module(config) {
@@ -12034,7 +12182,7 @@ function Module(config) {
 module.bundle.Module = Module;
 
 if (!module.bundle.parent && typeof WebSocket !== 'undefined') {
-  var ws = new WebSocket('ws://localhost:51580/');
+  var ws = new WebSocket('ws://localhost:57507/');
   ws.onmessage = function(event) {
     var data = JSON.parse(event.data);
 

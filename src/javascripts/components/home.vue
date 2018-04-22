@@ -5,13 +5,11 @@
   </div>
 </template>
 <script>
-import Header from './header.vue';
 import Slider from './slider.vue';
 import axios from 'axios';
 export default {
   name: "Home",
   components:{
-    Header,
     Slider
   },
   data:function(){
