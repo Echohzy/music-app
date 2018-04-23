@@ -10224,7 +10224,20 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#slider-
     methods: {
       changePage: function changePage(page) {
         this.currentPage = page;
+      },
+      startScrollBanner: function startScrollBanner() {
+        var _this = this;
+
+        if (this.timer) {
+          return;
+        }
+        this.timer = window.setInterval(function () {
+          _this.changePage((_this.currentPage + 1) % _this.totalPages);
+        }, 5000);
       }
+    },
+    created: function created() {
+      this.startScrollBanner();
     }
   };
 })();
@@ -10254,7 +10267,7 @@ if (module.hot) {
     if (!module.hot.data) {
       hotAPI.createRecord("data-v-3e6b9b46", __vue__options__);
     } else {
-      hotAPI.rerender("data-v-3e6b9b46", __vue__options__);
+      hotAPI.reload("data-v-3e6b9b46", __vue__options__);
     }
   })();
 }
@@ -11881,7 +11894,7 @@ module.exports.default = axios;
 },{"./utils":28,"./helpers/bind":30,"./core/Axios":32,"./defaults":29,"./cancel/Cancel":31,"./cancel/CancelToken":33,"./cancel/isCancel":34,"./helpers/spread":35}],24:[function(require,module,exports) {
 module.exports = require('./lib/axios');
 },{"./lib/axios":27}],7:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("h1[data-v-2d019784]{\n  font-size: 20px;\n}");(function () {
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("h1[data-v-2d019784]{\n  font-size: 20px;\n}\n.radio-container[data-v-2d019784]{\n  margin: 10px;\n}\n.radio-container h3[data-v-2d019784]{\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.radio-list[data-v-2d019784]{\n  display: flex;\n}\n.radio-block+.radio-block[data-v-2d019784]{\n  margin-left: 10px;\n}\n.radio-block[data-v-2d019784]{\n  flex: 1;\n}\n.radio-block img[data-v-2d019784]{\n  width: 100%;\n}\n.radio-block .title[data-v-2d019784]{\n  height: 30px;\n  padding:10px;\n  background: #fff;\n  font-size: 14px;\n}");(function () {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -11935,7 +11948,7 @@ if (__vue__options__.functional) {
   console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
 }
 __vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('Slider', { attrs: { "slider": _vm.slider } })], 1);
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('Slider', { attrs: { "slider": _vm.slider } }), _vm._v(" "), _c('div', { staticClass: "radio-container" }, [_c('h3', [_vm._v("电台")]), _vm._v(" "), _c('div', { staticClass: "radio-list" }, [_c('div', { staticClass: "radio-block" }, [_c('img', { attrs: { "src": _vm.radioList[0] && _vm.radioList[0].picUrl } }), _vm._v(" "), _c('div', { staticClass: "title" }, [_c('p', [_vm._v(_vm._s(_vm.radioList[0] && _vm.radioList[0].Ftitle))])])]), _vm._v(" "), _c('div', { staticClass: "radio-block" }, [_c('img', { attrs: { "src": _vm.radioList[1] && _vm.radioList[1].picUrl } }), _vm._v(" "), _c('div', { staticClass: "title" }, [_c('p', [_vm._v(_vm._s(_vm.radioList[1] && _vm.radioList[1].Ftitle))])])])])])], 1);
 };
 __vue__options__.staticRenderFns = [];
 __vue__options__._scopeId = "data-v-2d019784";
@@ -11949,7 +11962,7 @@ if (module.hot) {
     if (!module.hot.data) {
       hotAPI.createRecord("data-v-2d019784", __vue__options__);
     } else {
-      hotAPI.reload("data-v-2d019784", __vue__options__);
+      hotAPI.rerender("data-v-2d019784", __vue__options__);
     }
   })();
 }
@@ -12013,7 +12026,7 @@ if (module.hot) {
     if (!module.hot.data) {
       hotAPI.createRecord("data-v-26b8c1de", __vue__options__);
     } else {
-      hotAPI.rerender("data-v-26b8c1de", __vue__options__);
+      hotAPI.reload("data-v-26b8c1de", __vue__options__);
     }
   })();
 }
@@ -12212,7 +12225,7 @@ function Module(config) {
 module.bundle.Module = Module;
 
 if (!module.bundle.parent && typeof WebSocket !== 'undefined') {
-  var ws = new WebSocket('ws://localhost:59972/');
+  var ws = new WebSocket('ws://localhost:50742/');
   ws.onmessage = function(event) {
     var data = JSON.parse(event.data);
 

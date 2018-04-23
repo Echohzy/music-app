@@ -38,7 +38,18 @@
     methods:{
       changePage: function(page){ 
         this.currentPage = page;
+      },
+      startScrollBanner: function(){
+        if(this.timer){
+          return;
+        }
+        this.timer = window.setInterval(()=>{
+          this.changePage((this.currentPage+1)%this.totalPages);
+        }, 5000)
       }  
+    },
+    created: function(){
+      this.startScrollBanner();
     }
   };
 </script>
