@@ -17,6 +17,7 @@
         </div>
       </li>
     </ul>
+    <div class="view-more">去客户端发现更多好音乐></div>
   </div>
 </template>
 <script>
@@ -77,5 +78,11 @@
   }
   .content-block li .number, .content-block li .singer{
     color: #99A1B4;
+  }
+  .view-more{
+    fonr-size: 16px;
+    text-align: center;
+    color: #4c5475;
+    padding: 20px 0 10px;
   }
 </style>
