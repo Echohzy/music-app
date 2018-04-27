@@ -10193,7 +10193,7 @@ if (module.hot) {
   })();
 }
 },{"vueify/lib/insert-css":34,"./header.vue":30,"./tabs.vue":31,"vue-hot-reload-api":32,"vue":15}],29:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#slider-container[data-v-3e6b9b46]{\n  position: relative;\n}\n.slider-content[data-v-3e6b9b46]{\n  display: flex;\n  transition: all 0.2s ease;\n}\n.slider-item[data-v-3e6b9b46]{\n  width: 100vw;\n}\n.slider-item img[data-v-3e6b9b46]{\n  width: 100vw;\n}\n.page-content[data-v-3e6b9b46]{\n  position: absolute;\n  width: 100%;\n  text-align: center;\n  bottom: 20px;\n}\n.page-button[data-v-3e6b9b46]{\n  display: inline-block;\n  height: 10px;\n  width: 10px;\n  border-radius: 5px;\n  background: rgba(255, 255,255, 0.8); \n}\n.page-button + .page-button[data-v-3e6b9b46]{\n  margin-left: 6px;\n}");(function () {
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#slider-container[data-v-3e6b9b46]{\n  position: relative;\n  overflow: hidden;\n}\n.slider-content[data-v-3e6b9b46]{\n  display: flex;\n  transition: all 0.2s ease;\n}\n.slider-item[data-v-3e6b9b46]{\n  width: 100vw;\n}\n.slider-item img[data-v-3e6b9b46]{\n  width: 100vw;\n}\n.page-content[data-v-3e6b9b46]{\n  position: absolute;\n  width: 100%;\n  text-align: center;\n  bottom: 20px;\n}\n.page-button[data-v-3e6b9b46]{\n  display: inline-block;\n  height: 10px;\n  width: 10px;\n  border-radius: 5px;\n  background: rgba(255, 255,255, 0.8); \n}\n.page-button + .page-button[data-v-3e6b9b46]{\n  margin-left: 6px;\n}");(function () {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
@@ -10267,7 +10267,7 @@ if (module.hot) {
     if (!module.hot.data) {
       hotAPI.createRecord("data-v-3e6b9b46", __vue__options__);
     } else {
-      hotAPI.reload("data-v-3e6b9b46", __vue__options__);
+      hotAPI.rerender("data-v-3e6b9b46", __vue__options__);
     }
   })();
 }
@@ -11962,7 +11962,7 @@ if (module.hot) {
     if (!module.hot.data) {
       hotAPI.createRecord("data-v-2d019784", __vue__options__);
     } else {
-      hotAPI.reload("data-v-2d019784", __vue__options__);
+      hotAPI.rerender("data-v-2d019784", __vue__options__);
     }
   })();
 }
@@ -12031,7 +12031,7 @@ if (module.hot) {
   })();
 }
 },{"vueify/lib/insert-css":34,"axios":33,"vue-hot-reload-api":32,"vue":15}],13:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-container[data-v-5bb866e6]{\n  height: calc( 100% - 84px );\n  display: flex;\n  flex-direction: column;\n}\n.search-block[data-v-5bb866e6]{\n  margin: 10px;\n  background: #fdfdfd;\n  display: flex;\n  padding: 5px;\n  color: #818FAF;\n}\n.search-block i[data-v-5bb866e6]{\n  font-size: 20px;\n  margin-left: 5px;\n}\n.search-block input[data-v-5bb866e6]{\n  flex: 1;\n  line-height: 20px;\n  outline: none;\n}\n.search-content[data-v-5bb866e6]{\n  box-sizing: border-box;\n  padding: 10px;\n  background: #fdfdfd;\n  flex: 1;\n}");(function () {
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-container[data-v-5bb866e6]{\n  height: calc( 100% - 84px );\n  display: flex;\n  flex-direction: column;\n}\n.search-block[data-v-5bb866e6]{\n  margin: 10px;\n  background: #fdfdfd;\n  display: flex;\n  padding: 5px;\n  color: #818FAF;\n}\n.search-block i[data-v-5bb866e6]{\n  font-size: 20px;\n  margin-left: 5px;\n}\n.search-block input[data-v-5bb866e6]{\n  flex: 1;\n  line-height: 20px;\n  outline: none;\n  border: none;\n}\n.search-content[data-v-5bb866e6]{\n  box-sizing: border-box;\n  padding: 10px;\n  background: #fdfdfd;\n  flex: 1;\n}\n.search-content h2[data-v-5bb866e6]{\n  font-size: 16px;\n}\n.search-content .keys-block[data-v-5bb866e6]{\n  margin: 10px 0;\n}\n.keys-block .key[data-v-5bb866e6]{\nfont-size: 14px;\n  display: inline-block;\n  padding: 4px 10px;\n  border: 1px solid;\n  border-radius: 20px;\n  margin: 0 8px 10px 0;\n  color: rgba(0,0,0,0.7);\n}");(function () {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -12054,7 +12054,9 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-
     name: "Search",
     data: function data() {
       return {
-        hotKeys: []
+        hotKeys: [],
+        searchResults: {},
+        keyword: ""
       };
     },
     created: function created() {
@@ -12063,10 +12065,25 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-
       _axios2.default.get("/api/hot_key").then(function (res) {
         return res.data;
       }).then(function (data) {
-        _this.hotKeys = data && data.data && data.data.hotkey;
+        _this.hotKeys = data && data.data && data.data.hotkey && data.data.hotkey.slice(0, 12);
       }, function (error) {
         console.log(error);
       });
+    },
+    methods: {
+      getSearchResults: function getSearchResults(params) {
+        var _this2 = this;
+
+        _axios2.default.get("/api/search", {
+          params: params
+        }).then(function (res) {
+          return res.data;
+        }).then(function (data) {
+          _this2.searchResults = data;
+        }, function (error) {
+          console.log(error);
+        });
+      }
     }
   };
 })();
@@ -12076,10 +12093,12 @@ if (__vue__options__.functional) {
   console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
 }
 __vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm._m(0);
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "search-container" }, [_vm._m(0), _vm._v(" "), _c('div', { staticClass: "search-content" }, [_c('h2', [_vm._v("热门搜索")]), _vm._v(" "), _c('div', { staticClass: "keys-block" }, _vm._l(_vm.hotKeys, function (k) {
+    return _c('span', { staticClass: "key" }, [_vm._v(_vm._s(k.k))]);
+  }))])]);
 };
 __vue__options__.staticRenderFns = [function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "search-container" }, [_c('div', { staticClass: "search-block" }, [_c('input', { attrs: { "type": "text", "placeholder": "搜索歌曲、歌单、专辑" } }), _vm._v(" "), _c('i', { staticClass: "iconfont icon-search" })]), _vm._v(" "), _c('div', { staticClass: "search-content" }, [_c('h3', [_vm._v("热门搜索")])])]);
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "search-block" }, [_c('input', { attrs: { "type": "text", "placeholder": "搜索歌曲、歌单、专辑" } }), _vm._v(" "), _c('i', { staticClass: "iconfont icon-search" })]);
 }];
 __vue__options__._scopeId = "data-v-5bb866e6";
 if (module.hot) {
@@ -12092,7 +12111,7 @@ if (module.hot) {
     if (!module.hot.data) {
       hotAPI.createRecord("data-v-5bb866e6", __vue__options__);
     } else {
-      hotAPI.rerender("data-v-5bb866e6", __vue__options__);
+      hotAPI.reload("data-v-5bb866e6", __vue__options__);
     }
   })();
 }

@@ -56,6 +56,7 @@
 <style scoped>
   #slider-container{
     position: relative;
+    overflow: hidden;
   }
   .slider-content{
     display: flex;
