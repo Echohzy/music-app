@@ -1,8 +1,9 @@
 <template>
   <div class="search-container">
     <div class="search-block">
-      <input type="text" placeholder="搜索歌曲、歌单、专辑"/>
       <i class="iconfont icon-search"></i>
+      <input type="text" placeholder="搜索歌曲、歌单、专辑" v-on:focus="()=>setSearching(true)"/>
+      <button class="cancel" v-bind:class="{ hidden: !searching }" v-on:click="()=>setSearching(false)">取消</button>
     </div>
     <div class="search-content">
       <h2>热门搜索</h2>
@@ -21,7 +22,8 @@
       return {
         hotKeys:[],
         searchResults:{},
-        keyword: ""
+        keyword: "",
+        searching: false
       };
     },
     created: function(){
@@ -44,6 +46,10 @@
         }, function(error){
           console.log(error);
         })
+      },
+      setSearching: function(searching){
+        console.log(searching);
+        this.searching = searching;
       }
     }
   }
@@ -63,13 +69,21 @@
   }
   .search-block i{
     font-size: 20px;
-    margin-left: 5px;
+    margin-right: 5px;
   }
   .search-block input{
     flex: 1;
     line-height: 20px;
     outline: none;
     border: none;
+  }
+  .search-block .cancel{
+    border: none;
+    background: none;
+    outline: none;
+  }
+  .search-block .cancel.hidden{
+    display: none;
   }
   .search-content{
     box-sizing: border-box;
