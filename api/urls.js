@@ -9,6 +9,7 @@ const HOT_KEY_URL = `${HOST}/splcloud/fcgi-bin/gethotkey.fcg?${COMMON_PARAMS}`
 
 const SEARCH_FOR_URL = `${HOST}/soso/fcgi-bin/search_for_qq_cp?${COMMON_PARAMS}`
 
+
 module.exports = {
   HOME_SLIDER_URL,
   TOP_LIST_URL,

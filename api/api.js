@@ -14,7 +14,7 @@ function getHotKey(){
 }
 
 function getSearchResult(key, p=1, per=20){
-  return rp({uri: urls.SEARCH_FOR_URL+"&w="+key + "&p="+p+"&perpage="+per});
+  return rp({uri: urls.SEARCH_FOR_URL+"&w="+key + "&p="+p+"&perpage="+per, json: true});
 }
 
 module.exports = {

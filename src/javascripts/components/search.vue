@@ -1,11 +1,15 @@
 <template>
   <div class="search-container">
     <div class="search-block">
-      <i class="iconfont icon-search"></i>
-      <input type="text" placeholder="搜索歌曲、歌单、专辑" v-on:focus="()=>setSearching(true)"/>
+      <div class="search-wrapper">
+        <i class="iconfont icon-search"></i>
+        <input type="text" placeholder="搜索歌曲、歌单、专辑" v-on:focus="()=>setSearching(true)"  v-model="keyword" v-on:keydown="inputKeyword"/>
+      </div>
       <button class="cancel" v-bind:class="{ hidden: !searching }" v-on:click="()=>setSearching(false)">取消</button>
     </div>
-    <div class="search-content">
+    <div class="search-content" v-bind:class="{ hidden: !searching }">
+    </div>
+    <div class="search-content" v-bind:class="{ hidden: searching }">
       <h2>热门搜索</h2>
       <div class="keys-block">
         <span class="key" v-for="k in hotKeys">{{k.k}}</span>
@@ -42,13 +46,17 @@
         }).then(function(res){
           return res.data;
         }).then((data)=>{
-          this.searchResults = data;
+          this.searchResults = data&&data.data;
         }, function(error){
           console.log(error);
         })
       },
+      inputKeyword: function(e){
+        if(e.key==="Enter"){
+          this.getSearchResults({key: this.keyword, p:1, perpage: 10});
+        }
+      },
       setSearching: function(searching){
-        console.log(searching);
         this.searching = searching;
       }
     }
@@ -62,10 +70,15 @@
   }
   .search-block{
     margin: 10px;
+    
+    display: flex;
+    color: #818FAF;
+  }
+  .search-wrapper{
+    flex: 1;
+    padding: 5px;
     background: #fdfdfd;
     display: flex;
-    padding: 5px;
-    color: #818FAF;
   }
   .search-block i{
     font-size: 20px;
@@ -81,6 +94,7 @@
     border: none;
     background: none;
     outline: none;
+    margin-left: 10px;
   }
   .search-block .cancel.hidden{
     display: none;
@@ -91,6 +105,9 @@
     background: #fdfdfd;
     flex: 1;
   }
+  .search-content.hidden{
+    display: none;
+  }
   .search-content h2{
     font-size: 16px;
   }
@@ -98,7 +115,7 @@
     margin: 10px 0;
   }
   .keys-block .key{
-  font-size: 14px;
+    font-size: 14px;
     display: inline-block;
     padding: 4px 10px;
     border: 1px solid;
