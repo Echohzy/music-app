@@ -1,33 +1,40 @@
 <template>
-  <div id="toplist-container">
-    <ul class="list">
-      <li v-for="item in list" class="list-item">
-        <div class="img-block">
-          <img :src="item.picUrl" />
-        </div>
-        <div class="content-block">
-          <h3>{{item.topTitle}}</h3>
-          <ul class="song-list">
-            <li v-for="(s, index) in item.songList" :title="s.songname">
-              <span class="number">{{index+1}}</span>
-              <span class="name">{{s.songname}}</span>
-              <span class="singer">{{s.singername}}</span>
-            </li>
-          </ul>
-        </div>
-      </li>
-    </ul>
-    <div class="view-more">去客户端发现更多好音乐></div>
+  <div>
+    <Tabs />
+    <div id="toplist-container">
+      <ul class="list">
+        <li v-for="item in list" class="list-item">
+          <div class="img-block">
+            <img :src="item.picUrl" />
+          </div>
+          <div class="content-block">
+            <h3>{{item.topTitle}}</h3>
+            <ul class="song-list">
+              <li v-for="(s, index) in item.songList" :title="s.songname">
+                <span class="number">{{index+1}}</span>
+                <span class="name">{{s.songname}}</span>
+                <span class="singer">{{s.singername}}</span>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+      <div class="view-more">去客户端发现更多好音乐></div>
+    </div>
   </div>
 </template>
 <script>
   import axios from 'axios';
+  import Tabs from './tabs.vue';
   export default {
     name: "Toplist",
     data: function(){
       return {
         list:[]
       };
+    },
+    components:{
+      Tabs
     },
     created: function(){
       axios.get("/api/top_list").then(function(res){
@@ -43,6 +50,7 @@
 <style scoped>
   #toplist-container{
     padding: 10px;
+    background: #d1d7e1;
   }
   .list-item{
     display: flex;

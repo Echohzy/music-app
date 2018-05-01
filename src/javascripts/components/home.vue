@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Tabs />
     <Slider :slider="slider"/>
     <div class="radio-container">
       <h3>电台</h3>
@@ -23,10 +24,12 @@
 <script>
 import Slider from './slider.vue';
 import axios from 'axios';
+import Tabs from './tabs.vue';
 export default {
   name: "Home",
   components:{
-    Slider
+    Slider,
+    Tabs
   },
   data:function(){
     return {

@@ -10164,8 +10164,7 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("*{\n  ma
   exports.default = {
     name: "App",
     components: {
-      Header: _header2.default,
-      Tabs: _tabs2.default
+      Header: _header2.default
     }
   };
 })();
@@ -10175,7 +10174,7 @@ if (__vue__options__.functional) {
   console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
 }
 __vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { attrs: { "id": "app" } }, [_c('Header'), _vm._v(" "), _c('Tabs'), _vm._v(" "), _c('router-view', { staticClass: "view" })], 1);
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { attrs: { "id": "app" } }, [_c('Header'), _vm._v(" "), _c('router-view', { staticClass: "view" })], 1);
 };
 __vue__options__.staticRenderFns = [];
 if (module.hot) {
@@ -11909,6 +11908,10 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("h1[data-
 
   var _axios2 = _interopRequireDefault(_axios);
 
+  var _tabs = require('./tabs.vue');
+
+  var _tabs2 = _interopRequireDefault(_tabs);
+
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
   }
@@ -11916,7 +11919,8 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("h1[data-
   exports.default = {
     name: "Home",
     components: {
-      Slider: _slider2.default
+      Slider: _slider2.default,
+      Tabs: _tabs2.default
     },
     data: function data() {
       return {
@@ -11948,7 +11952,7 @@ if (__vue__options__.functional) {
   console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
 }
 __vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('Slider', { attrs: { "slider": _vm.slider } }), _vm._v(" "), _c('div', { staticClass: "radio-container" }, [_c('h3', [_vm._v("电台")]), _vm._v(" "), _c('div', { staticClass: "radio-list" }, [_c('div', { staticClass: "radio-block" }, [_c('img', { attrs: { "src": _vm.radioList[0] && _vm.radioList[0].picUrl } }), _vm._v(" "), _c('div', { staticClass: "title" }, [_c('p', [_vm._v(_vm._s(_vm.radioList[0] && _vm.radioList[0].Ftitle))])])]), _vm._v(" "), _c('div', { staticClass: "radio-block" }, [_c('img', { attrs: { "src": _vm.radioList[1] && _vm.radioList[1].picUrl } }), _vm._v(" "), _c('div', { staticClass: "title" }, [_c('p', [_vm._v(_vm._s(_vm.radioList[1] && _vm.radioList[1].Ftitle))])])])])])], 1);
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('Tabs'), _vm._v(" "), _c('Slider', { attrs: { "slider": _vm.slider } }), _vm._v(" "), _c('div', { staticClass: "radio-container" }, [_c('h3', [_vm._v("电台")]), _vm._v(" "), _c('div', { staticClass: "radio-list" }, [_c('div', { staticClass: "radio-block" }, [_c('img', { attrs: { "src": _vm.radioList[0] && _vm.radioList[0].picUrl } }), _vm._v(" "), _c('div', { staticClass: "title" }, [_c('p', [_vm._v(_vm._s(_vm.radioList[0] && _vm.radioList[0].Ftitle))])])]), _vm._v(" "), _c('div', { staticClass: "radio-block" }, [_c('img', { attrs: { "src": _vm.radioList[1] && _vm.radioList[1].picUrl } }), _vm._v(" "), _c('div', { staticClass: "title" }, [_c('p', [_vm._v(_vm._s(_vm.radioList[1] && _vm.radioList[1].Ftitle))])])])])])], 1);
 };
 __vue__options__.staticRenderFns = [];
 __vue__options__._scopeId = "data-v-2d019784";
@@ -11966,17 +11970,21 @@ if (module.hot) {
     }
   })();
 }
-},{"vueify/lib/insert-css":34,"./slider.vue":29,"axios":33,"vue-hot-reload-api":32,"vue":15}],11:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#toplist-container[data-v-26b8c1de]{\n  padding: 10px;\n}\n.list-item[data-v-26b8c1de]{\n  display: flex;\n  background: #fdfdfd;\n  box-shadow: 0 0 10px rgba(0,0,0,0.2);\n}\n.list-item + .list-item[data-v-26b8c1de]{\n  margin-top: 10px;\n}\n.list-item .img-block[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n  overflow: hidden;\n}\n.img-block img[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n}\n.content-block[data-v-26b8c1de]{\n  padding: 10px;\n  flex: 1;\n  overflow: hidden;\n  box-sizing: border-box;\n}\n.content-block h3[data-v-26b8c1de]{\n  font-size: 16px;\n  margin-bottom: 5px;\n}\n.content-block li[data-v-26b8c1de]{\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow:ellipsis;\n}\n.content-block li .number[data-v-26b8c1de], .content-block li .singer[data-v-26b8c1de]{\n  color: #99A1B4;\n}\n.view-more[data-v-26b8c1de]{\n  fonr-size: 16px;\n  text-align: center;\n  color: #4c5475;\n  padding: 20px 0 10px;\n}");(function () {
-  "use strict";
+},{"vueify/lib/insert-css":34,"./slider.vue":29,"axios":33,"./tabs.vue":31,"vue-hot-reload-api":32,"vue":15}],11:[function(require,module,exports) {
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#toplist-container[data-v-26b8c1de]{\n  padding: 10px;\n  background: #d1d7e1;\n}\n.list-item[data-v-26b8c1de]{\n  display: flex;\n  background: #fdfdfd;\n  box-shadow: 0 0 10px rgba(0,0,0,0.2);\n}\n.list-item + .list-item[data-v-26b8c1de]{\n  margin-top: 10px;\n}\n.list-item .img-block[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n  overflow: hidden;\n}\n.img-block img[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n}\n.content-block[data-v-26b8c1de]{\n  padding: 10px;\n  flex: 1;\n  overflow: hidden;\n  box-sizing: border-box;\n}\n.content-block h3[data-v-26b8c1de]{\n  font-size: 16px;\n  margin-bottom: 5px;\n}\n.content-block li[data-v-26b8c1de]{\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow:ellipsis;\n}\n.content-block li .number[data-v-26b8c1de], .content-block li .singer[data-v-26b8c1de]{\n  color: #99A1B4;\n}\n.view-more[data-v-26b8c1de]{\n  fonr-size: 16px;\n  text-align: center;\n  color: #4c5475;\n  padding: 20px 0 10px;\n}");(function () {
+  'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
 
-  var _axios = require("axios");
+  var _axios = require('axios');
 
   var _axios2 = _interopRequireDefault(_axios);
+
+  var _tabs = require('./tabs.vue');
+
+  var _tabs2 = _interopRequireDefault(_tabs);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -11988,6 +11996,9 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#toplist
       return {
         list: []
       };
+    },
+    components: {
+      Tabs: _tabs2.default
     },
     created: function created() {
       var _this = this;
@@ -12008,11 +12019,11 @@ if (__vue__options__.functional) {
   console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
 }
 __vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { attrs: { "id": "toplist-container" } }, [_c('ul', { staticClass: "list" }, _vm._l(_vm.list, function (item) {
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('Tabs'), _vm._v(" "), _c('div', { attrs: { "id": "toplist-container" } }, [_c('ul', { staticClass: "list" }, _vm._l(_vm.list, function (item) {
     return _c('li', { staticClass: "list-item" }, [_c('div', { staticClass: "img-block" }, [_c('img', { attrs: { "src": item.picUrl } })]), _vm._v(" "), _c('div', { staticClass: "content-block" }, [_c('h3', [_vm._v(_vm._s(item.topTitle))]), _vm._v(" "), _c('ul', { staticClass: "song-list" }, _vm._l(item.songList, function (s, index) {
       return _c('li', { attrs: { "title": s.songname } }, [_c('span', { staticClass: "number" }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c('span', { staticClass: "name" }, [_vm._v(_vm._s(s.songname))]), _vm._v(" "), _c('span', { staticClass: "singer" }, [_vm._v(_vm._s(s.singername))])]);
     }))])]);
-  })), _vm._v(" "), _c('div', { staticClass: "view-more" }, [_vm._v("去客户端发现更多好音乐>")])]);
+  })), _vm._v(" "), _c('div', { staticClass: "view-more" }, [_vm._v("去客户端发现更多好音乐>")])])], 1);
 };
 __vue__options__.staticRenderFns = [];
 __vue__options__._scopeId = "data-v-26b8c1de";
@@ -12026,12 +12037,12 @@ if (module.hot) {
     if (!module.hot.data) {
       hotAPI.createRecord("data-v-26b8c1de", __vue__options__);
     } else {
-      hotAPI.reload("data-v-26b8c1de", __vue__options__);
+      hotAPI.rerender("data-v-26b8c1de", __vue__options__);
     }
   })();
 }
-},{"vueify/lib/insert-css":34,"axios":33,"vue-hot-reload-api":32,"vue":15}],13:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-container[data-v-5bb866e6]{\n  height: calc( 100% - 84px );\n  display: flex;\n  flex-direction: column;\n}\n.search-block[data-v-5bb866e6]{\n  margin: 10px;\n  display: flex;\n  color: #818FAF;\n}\n.search-wrapper[data-v-5bb866e6]{\n  flex: 1;\n  padding: 5px;\n  background: #fdfdfd;\n  display: flex;\n}\n.search-block i[data-v-5bb866e6]{\n  font-size: 20px;\n}\n.search-block .icon-search[data-v-5bb866e6]{\n  margin-right: 5px;\n}\n.search-block .icon-close-border[data-v-5bb866e6]{\n  margin-left: 5px;\n}\n.search-block input[data-v-5bb866e6]{\n  flex: 1;\n  line-height: 20px;\n  outline: none;\n  border: none;\n}\n.search-block .cancel[data-v-5bb866e6]{\n  border: none;\n  background: none;\n  outline: none;\n  margin-left: 10px;\n}\n.search-content[data-v-5bb866e6]{\n  box-sizing: border-box;\n  padding: 10px;\n  background: #fdfdfd;\n  flex: 1;\n}\n.search-content h2[data-v-5bb866e6]{\n  font-size: 16px;\n}\n.search-content .keys-block[data-v-5bb866e6]{\n  margin: 10px 0;\n}\n.keys-block .key[data-v-5bb866e6]{\n  font-size: 14px;\n  display: inline-block;\n  padding: 4px 10px;\n  border: 1px solid;\n  border-radius: 20px;\n  margin: 0 8px 10px 0;\n  color: rgba(0,0,0,0.7);\n}\n.search-history-item[data-v-5bb866e6]{\n  font-size: 14px;\n  padding: 10px 0;\n}\n.search-history-item + .search-history-item[data-v-5bb866e6]{\n  border-top: 1px solid #d1d7e1;\n}\n.icon-close[data-v-5bb866e6]{\n  float: right;\n}\n.search-history-clean[data-v-5bb866e6]{\n  padding: 10px 0;\n  color: #4c5475;\n  text-align: center;\n}\n.hidden[data-v-5bb866e6]{\n  display: none;\n}");(function () {
+},{"vueify/lib/insert-css":34,"axios":33,"./tabs.vue":31,"vue-hot-reload-api":32,"vue":15}],13:[function(require,module,exports) {
+var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-block[data-v-5bb866e6]{\n  padding: 10px;\n  display: flex;\n  color: #818FAF;\n  background: #d1d7e1;\n}\n.search-wrapper[data-v-5bb866e6]{\n  flex: 1;\n  padding: 5px;\n  background: #fdfdfd;\n  display: flex;\n}\n.search-block i[data-v-5bb866e6]{\n  font-size: 20px;\n}\n.search-block .icon-search[data-v-5bb866e6]{\n  margin-right: 5px;\n}\n.search-block .icon-close-border[data-v-5bb866e6]{\n  margin-left: 5px;\n}\n.search-block input[data-v-5bb866e6]{\n  flex: 1;\n  line-height: 20px;\n  outline: none;\n  border: none;\n}\n.search-block .cancel[data-v-5bb866e6]{\n  border: none;\n  background: none;\n  outline: none;\n  margin-left: 10px;\n}\n.search-content[data-v-5bb866e6]{\n  box-sizing: border-box;\n  padding: 10px;\n  background: #fdfdfd;\n}\n.search-content h2[data-v-5bb866e6]{\n  font-size: 16px;\n}\n.search-content .keys-block[data-v-5bb866e6]{\n  margin: 10px 0;\n}\n.keys-block .key[data-v-5bb866e6]{\n  font-size: 14px;\n  display: inline-block;\n  padding: 4px 10px;\n  border: 1px solid;\n  border-radius: 20px;\n  margin: 0 8px 10px 0;\n  color: rgba(0,0,0,0.7);\n}\n.search-history-item[data-v-5bb866e6]{\n  font-size: 14px;\n  padding: 10px 0;\n}\n.search-history-item + .search-history-item[data-v-5bb866e6]{\n  border-top: 1px solid #d1d7e1;\n}\n.icon-close[data-v-5bb866e6]{\n  float: right;\n}\n.search-history-clean[data-v-5bb866e6]{\n  padding: 10px 0;\n  color: #4c5475;\n  text-align: center;\n}\n.no-result[data-v-5bb866e6]{\n  text-align: center;\n  padding: 40% 0;\n  color: #4c5475;\n}\n.song-item[data-v-5bb866e6]{\n  display: flex;\n}\n.music-logo[data-v-5bb866e6]{\n  width: 40px;\n}\n.icon-music[data-v-5bb866e6]{\n  font-size: 32px;\n}\n.song-item[data-v-5bb866e6]{\n  padding: 10px 0;\n}\n.song-item + .song-item[data-v-5bb866e6]{\n  border-top: 1px solid #d1d7e1; \n}\n.song-item .content[data-v-5bb866e6]{\n  position: relative;\n  overflow: hidden;\n}\n.song-item .name[data-v-5bb866e6]{\n  font-size: 14px;\n  overflow: hidden;\n  text-overflow:ellipsis;\n  white-space:nowrap;\n}\n.singer[data-v-5bb866e6] {\n  color: #818faf;\n}\n.hidden[data-v-5bb866e6]{\n  display: none;\n}");(function () {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -12042,9 +12053,9 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-
 
   var _axios2 = _interopRequireDefault(_axios);
 
-  var _vueRouter = require('vue-router');
+  var _tabs = require('./tabs.vue');
 
-  var _vueRouter2 = _interopRequireDefault(_vueRouter);
+  var _tabs2 = _interopRequireDefault(_tabs);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -12052,6 +12063,9 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-
 
   exports.default = {
     name: "Search",
+    components: {
+      Tabs: _tabs2.default
+    },
     data: function data() {
       return {
         hotKeys: [],
@@ -12096,11 +12110,12 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-
         this.keyword = keyword;
       },
       searchFromHistory: function searchFromHistory(keyword) {
+        this.searching = true;
         this.setKeyword(keyword);
         this.getSearchResults({ key: keyword, p: 1, perpage: 10 });
       },
       inputKeyword: function inputKeyword(e) {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && this.keyword) {
           this.getSearchResults({ key: this.keyword, p: 1, perpage: 10 });
         }
       },
@@ -12139,6 +12154,12 @@ var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-
       },
       setSearching: function setSearching(searching) {
         this.searching = searching;
+        if (!searching) {
+          this.searchResults = {};
+        }
+      },
+      turnToSingleSong: function turnToSingleSong(songmid) {
+        this.$router.push("/song?song_id=" + songmid);
       }
     }
   };
@@ -12149,30 +12170,37 @@ if (__vue__options__.functional) {
   console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
 }
 __vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "search-container" }, [_c('div', { staticClass: "search-block" }, [_c('div', { staticClass: "search-wrapper" }, [_c('i', { staticClass: "iconfont icon-search" }), _vm._v(" "), _c('input', { directives: [{ name: "model", rawName: "v-model", value: _vm.keyword, expression: "keyword" }], attrs: { "type": "text", "placeholder": "搜索歌曲、歌单、专辑" }, domProps: { "value": _vm.keyword }, on: { "focus": function focus() {
-        return _vm.setSearching(true);
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('Tabs'), _vm._v(" "), _c('div', { staticClass: "search-container" }, [_c('div', { staticClass: "search-block" }, [_c('div', { staticClass: "search-wrapper" }, [_c('i', { staticClass: "iconfont icon-search" }), _vm._v(" "), _c('input', { directives: [{ name: "model", rawName: "v-model", value: _vm.keyword, expression: "keyword" }], attrs: { "type": "text", "placeholder": "搜索歌曲、歌单、专辑" }, domProps: { "value": _vm.keyword }, on: { "focus": function focus($event) {
+        _vm.setSearching(true);
       }, "keydown": _vm.inputKeyword, "input": function input($event) {
         if ($event.target.composing) {
           return;
         }_vm.keyword = $event.target.value;
-      } } }), _vm._v(" "), _c('i', { staticClass: "iconfont icon-close-border", class: { hidden: !_vm.searching || _vm.keyword.length === 0 }, on: { "click": function click() {
-        return _vm.setKeyword('');
-      } } })]), _vm._v(" "), _c('button', { staticClass: "cancel", class: { hidden: !_vm.searching }, on: { "click": function click() {
-        return _vm.setSearching(false);
+      } } }), _vm._v(" "), _c('i', { staticClass: "iconfont icon-close-border", class: { hidden: !_vm.searching || _vm.keyword.length === 0 }, on: { "click": function click($event) {
+        _vm.setKeyword('');
+      } } })]), _vm._v(" "), _c('button', { staticClass: "cancel", class: { hidden: !_vm.searching }, on: { "click": function click($event) {
+        _vm.setSearching(false);
       } } }, [_vm._v("取消")])]), _vm._v(" "), _c('div', { staticClass: "search-content" }, [_c('div', { staticClass: "keys", class: { hidden: _vm.searching } }, [_c('h2', [_vm._v("热门搜索")]), _vm._v(" "), _c('div', { staticClass: "keys-block" }, _vm._l(_vm.hotKeys, function (k) {
-    return _c('span', { staticClass: "key" }, [_vm._v(_vm._s(k.k))]);
-  }))]), _vm._v(" "), _c('ul', { staticClass: "search-history", class: { hidden: !_vm.searching } }, [_vm._l(_vm.searchHistory, function (s) {
-    var this$1 = this;
-    return _c('li', { staticClass: "search-history-item", on: { "click": function click() {
-          return this$1.searchFromHistory(s);
+    return _c('span', { staticClass: "key", on: { "click": function click($event) {
+          _vm.searchFromHistory(k.k);
+        } } }, [_vm._v(_vm._s(k.k))]);
+  }))]), _vm._v(" "), _c('ul', { staticClass: "search-history", class: { hidden: !(_vm.searching && !_vm.searchResults.keyword) } }, [_vm._l(_vm.searchHistory, function (s) {
+    return _c('li', { staticClass: "search-history-item", on: { "click": function click($event) {
+          _vm.searchFromHistory(s);
         } } }, [_vm._v(_vm._s(s) + " "), _c('i', { staticClass: "iconfont icon-close", on: { "click": function click($event) {
-          $event.stopPropagation();return function () {
-            return _vm.removeSearchHistory(s);
-          }($event);
+          $event.stopPropagation();_vm.removeSearchHistory(s);
         } } })]);
-  }), _vm._v(" "), _c('li', { staticClass: "search-history-clean", class: { hidden: !_vm.searching || _vm.searchHistory.length === 0 }, on: { "click": _vm.cleanAllSearchHistory } }, [_vm._v("清除搜索记录")])], 2)])]);
+  }), _vm._v(" "), _c('li', { staticClass: "search-history-clean", class: { hidden: !_vm.searching || _vm.searchHistory.length === 0 }, on: { "click": _vm.cleanAllSearchHistory } }, [_vm._v("清除搜索记录")])], 2), _vm._v(" "), _c('div', { staticClass: "no-result", class: { hidden: !(_vm.searchResults.keyword && (!_vm.searchResults.song || _vm.searchResults.song.totalnum === 0)) } }, [_c('p', [_vm._v("抱歉，没有找到与”" + _vm._s(this.keyword) + "“相关的结果。")])]), _vm._v(" "), _c('ul', { staticClass: "song-list" }, _vm._l(_vm.searchResults.song && _vm.searchResults.song.list, function (s) {
+    return _c('li', { staticClass: "song-item", on: { "click": function click($event) {
+          _vm.turnToSingleSong(s.songmid);
+        } } }, [_vm._m(0, true), _vm._v(" "), _c('div', { staticClass: "content" }, [_c('p', { staticClass: "name", domProps: { "innerHTML": _vm._s(s.songname) } }), _vm._v(" "), _c('p', { staticClass: "singer" }, _vm._l(s.singer, function (p) {
+      return _c('span', { domProps: { "innerHTML": _vm._s(p.name) } });
+    }))])]);
+  }))])])], 1);
 };
-__vue__options__.staticRenderFns = [];
+__vue__options__.staticRenderFns = [function render() {
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "music-logo" }, [_c('i', { staticClass: "iconfont icon-music" })]);
+}];
 __vue__options__._scopeId = "data-v-5bb866e6";
 if (module.hot) {
   (function () {
@@ -12184,11 +12212,54 @@ if (module.hot) {
     if (!module.hot.data) {
       hotAPI.createRecord("data-v-5bb866e6", __vue__options__);
     } else {
-      hotAPI.rerender("data-v-5bb866e6", __vue__options__);
+      hotAPI.reload("data-v-5bb866e6", __vue__options__);
     }
   })();
 }
-},{"vueify/lib/insert-css":34,"axios":33,"vue-router":17,"vue-hot-reload-api":32,"vue":15}],36:[function(require,module,exports) {
+},{"vueify/lib/insert-css":34,"axios":33,"./tabs.vue":31,"vue-hot-reload-api":32,"vue":15}],62:[function(require,module,exports) {
+;(function () {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _axios = require("axios");
+
+  var _axios2 = _interopRequireDefault(_axios);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : { default: obj };
+  }
+
+  exports.default = {
+    name: "Song"
+  };
+})();
+if (module.exports.__esModule) module.exports = module.exports.default;
+var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
+if (__vue__options__.functional) {
+  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
+}
+__vue__options__.render = function render() {
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "song-container" });
+};
+__vue__options__.staticRenderFns = [];
+__vue__options__._scopeId = "data-v-b500e68c";
+if (module.hot) {
+  (function () {
+    var hotAPI = require("vue-hot-reload-api");
+    hotAPI.install(require("vue"), true);
+    if (!hotAPI.compatible) return;
+    module.hot.accept();
+    if (!module.hot.data) {
+      hotAPI.createRecord("data-v-b500e68c", __vue__options__);
+    } else {
+      hotAPI.reload("data-v-b500e68c", __vue__options__);
+    }
+  })();
+}
+},{"axios":33,"vue-hot-reload-api":32,"vue":15}],36:[function(require,module,exports) {
 var bundleURL = null;
 function getBundleURLCached() {
   if (!bundleURL) {
@@ -12288,6 +12359,10 @@ var _search = require('./components/search.vue');
 
 var _search2 = _interopRequireDefault(_search);
 
+var _song = require('./components/song.vue');
+
+var _song2 = _interopRequireDefault(_song);
+
 require('../stylesheets/style.scss');
 
 require('../stylesheets/iconfont.scss');
@@ -12296,7 +12371,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 _vue2.default.use(_vueRouter2.default);
 
-var routes = [{ path: "/home", component: _home2.default }, { path: "/toplist", component: _toplist2.default }, { path: "/search", component: _search2.default }];
+var routes = [{ path: "/home", component: _home2.default }, { path: "/toplist", component: _toplist2.default }, { path: "/search", component: _search2.default }, { path: "/song", component: _song2.default }];
 
 var router = new _vueRouter2.default({
   mode: 'history',
@@ -12309,7 +12384,7 @@ new _vue2.default({
     return h(_app2.default);
   }
 }).$mount('#app');
-},{"vue":15,"vue-router":17,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],0:[function(require,module,exports) {
+},{"vue":15,"vue-router":17,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/song.vue":62,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],0:[function(require,module,exports) {
 var global = (1, eval)('this');
 var OldModule = module.bundle.Module;
 function Module(config) {
