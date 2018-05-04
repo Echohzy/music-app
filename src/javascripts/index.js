@@ -4,7 +4,7 @@ import App from './components/app.vue';
 import Home from "./components/home.vue";
 import Toplist from "./components/toplist.vue";
 import Search from "./components/search.vue";
-import Song from "./components/song.vue";
+import Topiclist from "./components/topiclist.vue";
 
 import "../stylesheets/style.scss";
 import "../stylesheets/iconfont.scss";
@@ -15,7 +15,7 @@ const routes = [
   { path:"/home", component: Home },
   { path:"/toplist", component: Toplist },
   { path: "/search", component: Search },
-  { path: "/song", component: Song }
+  { path: "/topiclist", component: Topiclist }
 ];
 
 const router = new VueRouter({

@@ -12216,24 +12216,15 @@ if (module.hot) {
     }
   })();
 }
-},{"vueify/lib/insert-css":34,"axios":33,"./tabs.vue":31,"vue-hot-reload-api":32,"vue":15}],62:[function(require,module,exports) {
+},{"vueify/lib/insert-css":34,"axios":33,"./tabs.vue":31,"vue-hot-reload-api":32,"vue":15}],63:[function(require,module,exports) {
 ;(function () {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-
-  var _axios = require("axios");
-
-  var _axios2 = _interopRequireDefault(_axios);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
-  }
-
   exports.default = {
-    name: "Song"
+    name: "Topiclist"
   };
 })();
 if (module.exports.__esModule) module.exports = module.exports.default;
@@ -12242,10 +12233,9 @@ if (__vue__options__.functional) {
   console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
 }
 __vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "song-container" });
+  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "topiclist-container" });
 };
 __vue__options__.staticRenderFns = [];
-__vue__options__._scopeId = "data-v-b500e68c";
 if (module.hot) {
   (function () {
     var hotAPI = require("vue-hot-reload-api");
@@ -12253,13 +12243,13 @@ if (module.hot) {
     if (!hotAPI.compatible) return;
     module.hot.accept();
     if (!module.hot.data) {
-      hotAPI.createRecord("data-v-b500e68c", __vue__options__);
+      hotAPI.createRecord("data-v-5d8e4af8", __vue__options__);
     } else {
-      hotAPI.reload("data-v-b500e68c", __vue__options__);
+      hotAPI.rerender("data-v-5d8e4af8", __vue__options__);
     }
   })();
 }
-},{"axios":33,"vue-hot-reload-api":32,"vue":15}],36:[function(require,module,exports) {
+},{"vue-hot-reload-api":32,"vue":15}],36:[function(require,module,exports) {
 var bundleURL = null;
 function getBundleURLCached() {
   if (!bundleURL) {
@@ -12359,9 +12349,9 @@ var _search = require('./components/search.vue');
 
 var _search2 = _interopRequireDefault(_search);
 
-var _song = require('./components/song.vue');
+var _topiclist = require('./components/topiclist.vue');
 
-var _song2 = _interopRequireDefault(_song);
+var _topiclist2 = _interopRequireDefault(_topiclist);
 
 require('../stylesheets/style.scss');
 
@@ -12371,7 +12361,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 _vue2.default.use(_vueRouter2.default);
 
-var routes = [{ path: "/home", component: _home2.default }, { path: "/toplist", component: _toplist2.default }, { path: "/search", component: _search2.default }, { path: "/song", component: _song2.default }];
+var routes = [{ path: "/home", component: _home2.default }, { path: "/toplist", component: _toplist2.default }, { path: "/search", component: _search2.default }, { path: "/topiclist", component: _topiclist2.default }];
 
 var router = new _vueRouter2.default({
   mode: 'history',
@@ -12384,7 +12374,7 @@ new _vue2.default({
     return h(_app2.default);
   }
 }).$mount('#app');
-},{"vue":15,"vue-router":17,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/song.vue":62,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],0:[function(require,module,exports) {
+},{"vue":15,"vue-router":17,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/topiclist.vue":63,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],0:[function(require,module,exports) {
 var global = (1, eval)('this');
 var OldModule = module.bundle.Module;
 function Module(config) {
