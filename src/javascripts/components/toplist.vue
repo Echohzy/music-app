@@ -3,7 +3,7 @@
     <Tabs />
     <div id="toplist-container">
       <ul class="list">
-        <li v-for="item in list" class="list-item">
+        <li v-for="item in list" class="list-item" v-on:click="turnToTopicPage(item.id)">
           <div class="img-block">
             <img :src="item.picUrl" />
           </div>
@@ -44,6 +44,11 @@
       }, function(error){
         console.log(error);
       })
+    },
+    methods: {
+      turnToTopicPage: function(id){
+        this.$router.push('/topiclist/'+id);
+      }
     }
   };
 </script>

@@ -16,18 +16,28 @@ function removeScript(scriptId){
   }
 }
 
+function removeCallbackFunction(callbackFunctionName){
+  if(window[callbackFunctionName]){
+    try{
+      delete wwindow[callbackFunctionName];
+    }catch(e){
+      window[callbackFunctionName] = undefined;
+    }
+  }
+}
+
 function clearTimer(timer){
   if(!timer){
     return;
   }
-  clearTimer(timer);
+  clearTimeout(timer);
 }
 
 function fetchJsonp(url, options=default_options){
   let timer;
   return new Promise(function(resolve, reject){
     let callbackFunctionName = generateCallbackFunctionName(options.callbackFunction),
-      _url = `${url}?${options.callback}=${callbackFunctionName}`,
+      _url = `${url}&${options.callback}=${callbackFunctionName}`,
       scriptId = `${url}_${callbackFunctionName}`,
       script=document.createElement("script"),
       head=document.getElementsByTagName("head")[0];
@@ -39,9 +49,10 @@ function fetchJsonp(url, options=default_options){
       window[callbackFunctionName] = function(response){
         resolve({
           status: "success",
-          json: ()=>Promise.resolve(respons)
+          json: ()=>Promise.resolve(response)
         });
         removeScript(scriptId);
+        removeCallbackFunction(callbackFunctionName);
         timer = clearTimer(timer);
       }
       
@@ -51,6 +62,7 @@ function fetchJsonp(url, options=default_options){
           message: "timeout"
         });
         removeScript(scriptId);
+        removeCallbackFunction(callbackFunctionName);
         timer = null;
       }, options.timeout||default_options.timeout);
       
@@ -60,7 +72,10 @@ function fetchJsonp(url, options=default_options){
           message: message
         });
         removeScript(scriptId);
+        removeCallbackFunction(callbackFunctionName);
         timer = clearTimer(timer);
       }
   });
 }
+
+export default fetchJsonp;

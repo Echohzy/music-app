@@ -15,7 +15,7 @@ const routes = [
   { path:"/home", component: Home },
   { path:"/toplist", component: Toplist },
   { path: "/search", component: Search },
-  { path: "/topiclist", component: Topiclist }
+  { path: "/topiclist/:id", component: Topiclist }
 ];
 
 const router = new VueRouter({
