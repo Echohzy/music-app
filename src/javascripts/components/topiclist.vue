@@ -12,11 +12,12 @@
           <p class="date">更新时间：{{detail.update_time}}</p>
         </div>
       </div>
+      <MusicPlayer :music="music"/>
     </div>
     <div class="topic-list">
       <p class="total-num">共{{detail.cur_song_num}}首</p>
       <ul class="song-list">
-        <li v-for=" s in detail.songlist">
+        <li v-for=" s in detail.songlist" v-on:click="setMusicUrl(s.data&&s.data.strMediaMid, s.data&&s.data.songname, s.data&&s.data.singer)">
           <p class="song-name" :title="s.data&&s.data.songname">{{s.data&&s.data.songname}}</p>
           <p class="song-singer">{{getSinerNames(s.data.singer)}}</p>
         </li>
@@ -26,13 +27,18 @@
 </template>
 <script>
   import fetchJsonp from "../utils/fetch_jsonp.js";
+  import MusicPlayer from "./music_player.vue";
   const topic_url = "https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?g_tk=5381&uin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&tpl=3&page=detail&type=top&_=1492910996732"
   export default {
     name: "Topiclist",
     data: function(){
       return {
+        music: {},
         detail: {}
       };
+    },
+    components: {
+      MusicPlayer: MusicPlayer
     },
     created: function(){
       fetchJsonp(`${topic_url}&topid=${this.$route.params.id}`, {
@@ -52,6 +58,13 @@
           names.push(s.name);
         });
         return names.join("/");
+      },
+      setMusicUrl: function(mid, songname, singers){
+        this.music = {
+          url: `http://dl.stream.qqmusic.qq.com/C400${mid}.m4a?guid=7931438544&vkey=72A8E5B5A52D4BD8EB8063ACA85F9E673970EF727E4861BF911AE68A4926CF56B64C62F65F29AD2476665E6C0F67D5B20A6EBDB3881A0162&uin=0&fromtag=38`,
+          songname: songname,
+          singers: singers
+        };
       }
     }
   };
@@ -59,10 +72,9 @@
 <style scoped>
   .topic-detail{
     display: flex;
-    padding: 50px 15px;
+    padding: 50px 15px  20px;
     height: 125px;
     align-items: center;
-    background: rgba(94, 116,160, 0.5);
   }
   .topic-cover{
     height: 125px;
@@ -89,11 +101,12 @@
   }
   .topic-detail-wrapper{
     position: relative;
+    background: rgba(94, 116,160, 0.5);
   }
   .background-img{
     position: absolute;
     z-index: -1;
-    height: 215px;
+    height: calc(100% - 10px);
     width: 100%;
     filter: blur(10px);
   }
@@ -121,11 +134,11 @@
     counter-increment: songCounter;
   }
   .topic-list{
-    background: #d1d7e1;
+    background: #fdfdfd;
   }
   .total-num{
     font-size: 14px;
-    color: #fdfdfd;
+    color: #4c5475;
     padding: 10px;
     margin-bottom: 5px;
   }
