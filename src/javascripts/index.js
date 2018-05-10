@@ -5,6 +5,7 @@ import Home from "./components/home.vue";
 import Toplist from "./components/toplist.vue";
 import Search from "./components/search.vue";
 import Topiclist from "./components/topiclist.vue";
+import HomeContainer from "./components/home_container.vue";
 
 import "../stylesheets/style.scss";
 import "../stylesheets/iconfont.scss";
@@ -12,9 +13,19 @@ import "../stylesheets/iconfont.scss";
 Vue.use(VueRouter);
 
 const routes = [
-  { path:"/home", component: Home },
-  { path:"/toplist", component: Toplist },
-  { path: "/search", component: Search },
+  { path: "/", component: HomeContainer,
+    children:[
+      {
+        path: "home",
+        component: Home
+      },{
+        path: "toplist",
+        component: Toplist
+      },{
+        path: "search",
+        component: Search
+      }
+    ]},
   { path: "/topiclist/:id", component: Topiclist }
 ];
 

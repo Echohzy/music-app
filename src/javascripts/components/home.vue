@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Tabs />
     <Slider :slider="slider"/>
     <div class="radio-container">
       <h3>电台</h3>

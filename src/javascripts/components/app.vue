@@ -6,7 +6,6 @@
 </template>
 <script>
   import Header from './header.vue';
-  import Tabs from './tabs.vue';
   export default {
     name: "App",
     components: {

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Tabs />
     <div id="toplist-container">
       <ul class="list">
         <li v-for="item in list" class="list-item" v-on:click="turnToTopicPage(item.id)">

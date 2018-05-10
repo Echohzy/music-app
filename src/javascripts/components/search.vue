@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Tabs />
     <div class="search-container">
       <div class="search-block">
         <div class="search-wrapper">
