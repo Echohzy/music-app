@@ -39,3 +39,14 @@ new Vue({
   router,
   render: (h)=>{return h(App)}
 }).$mount('#app');
+
+if("serviceWorker" in navigator ) {
+  window.addEventListener('load', function (){
+    navigator.serviceWorker.register("http://127.0.0.1:3000/sw.js", { scope: "/" })
+    .then(function(registration){
+      
+    }).catch(function(error){
+      
+    })
+  })
+}
