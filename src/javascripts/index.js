@@ -13,16 +13,17 @@ import "../stylesheets/iconfont.scss";
 Vue.use(VueRouter);
 
 const routes = [
-  { path: "/", component: HomeContainer,
+  { path: "/", redirect: "/home" },
+  { path: "", component: HomeContainer,
     children:[
       {
-        path: "home",
+        path: "/home",
         component: Home
       },{
-        path: "toplist",
+        path: "/toplist",
         component: Toplist
       },{
-        path: "search",
+        path: "/search",
         component: Search
       }
     ]},

@@ -1,7 +1,9 @@
 <template>
   <div class="home-container">
     <Tabs />
-    <router-view class="view"></router-view>
+    <transition name="fade" mode="out-in">
+      <router-view class="view"></router-view>
+    </transition>
   </div>
 </template>
 <script>
@@ -13,5 +15,11 @@
     }
   }
 </script>
-<style scoped>
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
 </style>
