@@ -14811,7 +14811,207 @@ render._withStripped = true
       
       }
     })();
-},{"./tabs.vue":54,"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],3:[function(require,module,exports) {
+},{"./tabs.vue":54,"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],161:[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+    name: "Notification",
+    props: ["message", "status"],
+    data: function data() {
+        return {
+            show: false
+        };
+    },
+    mounted: function mounted() {
+        var _this = this;
+
+        this.show = true;
+        setTimeout(function () {
+            _this.removeSelf();
+        }, 3000);
+    },
+    methods: {
+        removeSelf: function removeSelf() {
+            this.show = false;
+        }
+    }
+};
+      var $18fa33 = exports.default || module.exports;
+      if (typeof $18fa33 === 'function') {
+        $18fa33 = $18fa33.options;
+      }
+    
+        /* template */
+        Object.assign($18fa33, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("transition", { attrs: { name: "notification" } }, [
+    _vm.show
+      ? _c("div", { staticClass: "notification-block" }, [
+          _c("span", { staticClass: "content", class: _vm.status }, [
+            _vm._v(_vm._s(_vm.message))
+          ])
+        ])
+      : _vm._e()
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-18fa33",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$18fa33', $18fa33);
+          } else {
+            api.reload('$18fa33', $18fa33);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],158:[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _notification = require('./notification.vue');
+
+var _notification2 = _interopRequireDefault(_notification);
+
+var _vue = require('vue');
+
+var _vue2 = _interopRequireDefault(_vue);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+    name: "SignIn",
+    methods: {
+        addNotification: function addNotification(status) {
+            var n = new _vue2.default({
+                render: function render(c) {
+                    return c(_notification2.default, { props: { status: status, message: status } });
+                }
+            }).$mount();
+            document.getElementById("notification-container").appendChild(n.$el);
+        }
+    }
+};
+      var $b6dee9 = exports.default || module.exports;
+      if (typeof $b6dee9 === 'function') {
+        $b6dee9 = $b6dee9.options;
+      }
+    
+        /* template */
+        Object.assign($b6dee9, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "sign-in-container" }, [
+    _c("div", { attrs: { id: "notification-container" } }),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        on: {
+          click: function($event) {
+            _vm.addNotification("error")
+          }
+        }
+      },
+      [_vm._v("Add Error Notification")]
+    ),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        on: {
+          click: function($event) {
+            _vm.addNotification("success")
+          }
+        }
+      },
+      [_vm._v("Add Success Notification")]
+    )
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: null,
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$b6dee9', $b6dee9);
+          } else {
+            api.reload('$b6dee9', $b6dee9);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"./notification.vue":161,"vue":19,"_css_loader":35,"vue-hot-reload-api":57}],3:[function(require,module,exports) {
 
         var reloadCSS = require('_css_loader');
         module.hot.dispose(reloadCSS);
@@ -14858,6 +15058,10 @@ var _home_container = require('./components/home_container.vue');
 
 var _home_container2 = _interopRequireDefault(_home_container);
 
+var _sign_in = require('./components/sign_in.vue');
+
+var _sign_in2 = _interopRequireDefault(_sign_in);
+
 require('../stylesheets/style.scss');
 
 require('../stylesheets/iconfont.scss');
@@ -14876,7 +15080,7 @@ var routes = [{ path: "/", redirect: "/home" }, { path: "", component: _home_con
   }, {
     path: "/search",
     component: _search2.default
-  }] }, { path: "/topiclist/:id", component: _topiclist2.default }];
+  }] }, { path: "/topiclist/:id", component: _topiclist2.default }, { path: "/sign_in", component: _sign_in2.default }];
 
 var router = new _vueRouter2.default({
   mode: 'history',
@@ -14895,7 +15099,7 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register(window.location.origin + "/sw.js", { scope: "/" }).then(function (registration) {}).catch(function (error) {});
   });
 }
-},{"vue":19,"vue-router":21,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/topiclist.vue":15,"./components/home_container.vue":17,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],156:[function(require,module,exports) {
+},{"vue":19,"vue-router":21,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/topiclist.vue":15,"./components/home_container.vue":17,"./components/sign_in.vue":158,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],204:[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -15065,5 +15269,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},[156,1], null)
+},{}]},{},[204,1], null)
 //# sourceMappingURL=/index.map

@@ -361,6 +361,38 @@ aduio[data-v-1e008b]{
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+.notification-block[data-v-18fa33]{
+    position: fixed;
+    height: 30px;
+    text-align: center;
+    height: 26px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+.content[data-v-18fa33]{
+    display: inline-block;
+    padding: 0 10px;
+    line-height: 30px;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 15px;
+    opacity: 0.8;
+}
+.success[data-v-18fa33]{
+    background: #5cb85c;
+}
+.error[data-v-18fa33]{
+    background: #d9534f;
+}
+.notification-enter-active[data-v-18fa33], .notification-leave-active[data-v-18fa33] {
+  transition: opacity .5s;
+}
+.notification-enter[data-v-18fa33], .notification-leave-to[data-v-18fa33] {
+  opacity: 0;
 }@charset "UTF-8";
 html {
   overflow-y: scroll; }
