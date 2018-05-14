@@ -42,7 +42,7 @@ new Vue({
 
 if("serviceWorker" in navigator ) {
   window.addEventListener('load', function (){
-    navigator.serviceWorker.register("http://127.0.0.1:3000/sw.js", { scope: "/" })
+    navigator.serviceWorker.register(window.location.origin+"/sw.js", { scope: "/" })
     .then(function(registration){
       
     }).catch(function(error){

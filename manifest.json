@@ -1,0 +1,6 @@
+{
+    "short_name": "Music App",
+    "name": "Music App",
+    "start_url": "/home",
+    "display": "standalone"
+}

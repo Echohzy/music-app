@@ -6,17 +6,19 @@
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
 
-require = (function (modules, cache, entry) {
+// eslint-disable-next-line no-global-assign
+parcelRequire = (function (modules, cache, entry, globalName) {
   // Save the require from previous bundle to this closure if any
-  var previousRequire = typeof require === "function" && require;
+  var previousRequire = typeof parcelRequire === 'function' && parcelRequire;
+  var nodeRequire = typeof require === 'function' && require;
 
-  function newRequire(name, jumped, ModuleConfig) {
+  function newRequire(name, jumped) {
     if (!cache[name]) {
       if (!modules[name]) {
         // if we cannot find the module within our internal map or
         // cache jump to the current global require ie. the last bundle
         // that was added to the page.
-        var currentRequire = typeof require === "function" && require;
+        var currentRequire = typeof parcelRequire === 'function' && parcelRequire;
         if (!jumped && currentRequire) {
           return currentRequire(name, true);
         }
@@ -29,16 +31,21 @@ require = (function (modules, cache, entry) {
           return previousRequire(name, true);
         }
 
+        // Try the node require function if it exists.
+        if (nodeRequire && typeof name === 'string') {
+          return nodeRequire(name);
+        }
+
         var err = new Error('Cannot find module \'' + name + '\'');
         err.code = 'MODULE_NOT_FOUND';
         throw err;
       }
-      
+
       localRequire.resolve = resolve;
 
-      var module = cache[name] = new newRequire.Module(ModuleConfig);
+      var module = cache[name] = new newRequire.Module(name);
 
-      modules[name][0].call(module.exports, localRequire, module, module.exports);
+      modules[name][0].call(module.exports, localRequire, module, module.exports, this);
     }
 
     return cache[name].exports;
@@ -52,11 +59,13 @@ require = (function (modules, cache, entry) {
     }
   }
 
-  function Module() {
+  function Module(moduleName) {
+    this.id = moduleName;
     this.bundle = newRequire;
     this.exports = {};
   }
 
+  newRequire.isParcelRequire = true;
   newRequire.Module = Module;
   newRequire.modules = modules;
   newRequire.cache = cache;
@@ -66,10 +75,31 @@ require = (function (modules, cache, entry) {
     newRequire(entry[i]);
   }
 
+  if (entry.length) {
+    // Expose entry point to Node, AMD or browser globals
+    // Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
+    var mainExports = newRequire(entry[entry.length - 1]);
+
+    // CommonJS
+    if (typeof exports === "object" && typeof module !== "undefined") {
+      module.exports = mainExports;
+
+    // RequireJS
+    } else if (typeof define === "function" && define.amd) {
+     define(function () {
+       return mainExports;
+     });
+
+    // <script>
+    } else if (globalName) {
+      this[globalName] = mainExports;
+    }
+  }
+
   // Override the current require with this new one
   return newRequire;
 })({19:[function(require,module,exports) {
-var global = (1,eval)("this");
+var global = arguments[3];
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9802,32 +9832,68 @@ if (inBrowser && window.Vue) {
 }
 
 exports.default = VueRouter;
-},{}],44:[function(require,module,exports) {
-var inserted = exports.cache = {}
-
-function noop () {}
-
-exports.insert = function (css) {
-  if (inserted[css]) return noop
-  inserted[css] = true
-
-  var elem = document.createElement('style')
-  elem.setAttribute('type', 'text/css')
-
-  if ('textContent' in elem) {
-    elem.textContent = css
-  } else {
-    elem.styleSheet.cssText = css
+},{}],45:[function(require,module,exports) {
+var bundleURL = null;
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
   }
 
-  document.getElementsByTagName('head')[0].appendChild(elem)
-  return function () {
-    document.getElementsByTagName('head')[0].removeChild(elem)
-    inserted[css] = false
-  }
+  return bundleURL;
 }
 
-},{}],42:[function(require,module,exports) {
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g);
+    if (matches) {
+      return getBaseURL(matches[0]);
+    }
+  }
+
+  return '/';
+}
+
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
+}
+
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],35:[function(require,module,exports) {
+var bundle = require('./bundle-url');
+
+function updateLink(link) {
+  var newLink = link.cloneNode();
+  newLink.onload = function () {
+    link.remove();
+  };
+  newLink.href = link.href.split('?')[0] + '?' + Date.now();
+  link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+
+var cssTimeout = null;
+function reloadCSS() {
+  if (cssTimeout) {
+    return;
+  }
+
+  cssTimeout = setTimeout(function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    for (var i = 0; i < links.length; i++) {
+      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
+        updateLink(links[i]);
+      }
+    }
+
+    cssTimeout = null;
+  }, 50);
+}
+
+module.exports = reloadCSS;
+},{"./bundle-url":45}],57:[function(require,module,exports) {
 var Vue // late bind
 var version
 var map = (window.__VUE_HOT_MAP__ = Object.create(null))
@@ -10069,202 +10135,332 @@ exports.reload = tryWrap(function (id, options) {
   })
 })
 
-},{}],39:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".header[data-v-725b4ef2]{\n  height: 44px;\n  background: #4c5475;\n  display: flex;\n  align-items: center;\n  padding: 0 10px;\n}\nh1[data-v-725b4ef2]{\n  flex: 1;\n  font-size: 18px;\n  color: #FDFDFD;\n  font-weight: lighter;\n}\nbutton[data-v-725b4ef2]{\n  color: #fdfdfd;\n  background: #818FAF;\n  border: none;\n  padding: 6px 10px;\n  border-radius: 15px;\n}");(function () {
-  "use strict";
+},{}],52:[function(require,module,exports) {
+"use strict";
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = {
-    name: "Header"
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
-}
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _vm._m(0);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+  name: "Header"
 };
-__vue__options__.staticRenderFns = [function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "header" }, [_c('h1', [_vm._v("Music App")]), _vm._v(" "), _c('button', [_vm._v("Download")])]);
-}];
-__vue__options__._scopeId = "data-v-725b4ef2";
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-725b4ef2", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-725b4ef2", __vue__options__);
-    }
-  })();
+      var $1c7c56 = exports.default || module.exports;
+      if (typeof $1c7c56 === 'function') {
+        $1c7c56 = $1c7c56.options;
+      }
+    
+        /* template */
+        Object.assign($1c7c56, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _vm._m(0)
 }
-},{"vueify/lib/insert-css":44,"vue-hot-reload-api":42,"vue":19}],7:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("*{\n  margin: 0;\n  padding: 0;\n}\nhtml, body{\n  height: 100%;\n}\n#app{\n  height: 100%;\n}");(function () {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _header = require("./header.vue");
-
-  var _header2 = _interopRequireDefault(_header);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "header" }, [
+      _c("h1", [_vm._v("Music App")]),
+      _vm._v(" "),
+      _c("button", [_vm._v("Download")])
+    ])
   }
+]
+render._withStripped = true
 
-  exports.default = {
-    name: "App",
-    components: {
-      Header: _header2.default
-    }
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
-}
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { attrs: { "id": "app" } }, [_c('Header'), _vm._v(" "), _c('router-view', { staticClass: "view" })], 1);
-};
-__vue__options__.staticRenderFns = [];
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-ff29d1e8", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-ff29d1e8", __vue__options__);
-    }
-  })();
-}
-},{"vueify/lib/insert-css":44,"./header.vue":39,"vue-hot-reload-api":42,"vue":19}],37:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#slider-container[data-v-3e6b9b46]{\n  position: relative;\n  overflow: hidden;\n}\n.slider-content[data-v-3e6b9b46]{\n  display: flex;\n  transition: all 0.2s ease;\n}\n.slider-item[data-v-3e6b9b46]{\n  width: 100vw;\n}\n.slider-item img[data-v-3e6b9b46]{\n  width: 100vw;\n}\n.page-content[data-v-3e6b9b46]{\n  position: absolute;\n  width: 100%;\n  text-align: center;\n  bottom: 20px;\n}\n.page-button[data-v-3e6b9b46]{\n  display: inline-block;\n  height: 8px;\n  width: 8px;\n  border-radius: 6px;\n  border: 2px solid rgba(255, 255,255, 0.8);\n  background: rgba(255, 255,255, 0.8); \n}\n.page-button.active[data-v-3e6b9b46]{\n  background: #4c5475;\n}\n.page-button + .page-button[data-v-3e6b9b46]{\n  margin-left: 6px;\n}");(function () {
-  "use strict";
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-1c7c56",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$1c7c56', $1c7c56);
+          } else {
+            api.reload('$1c7c56', $1c7c56);
+          }
+        }
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = {
-    name: "Slider",
-    data: function data() {
-      return {
-        currentPage: 0,
-        touchPosition: {}
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],7:[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _header = require("./header.vue");
+
+var _header2 = _interopRequireDefault(_header);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+  name: "App",
+  components: {
+    Header: _header2.default
+  }
+}; //
+//
+//
+//
+//
+//
+      var $131bb7 = exports.default || module.exports;
+      if (typeof $131bb7 === 'function') {
+        $131bb7 = $131bb7.options;
+      }
+    
+        /* template */
+        Object.assign($131bb7, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { attrs: { id: "app" } },
+    [_c("Header"), _vm._v(" "), _c("router-view", { staticClass: "view" })],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: null,
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$131bb7', $131bb7);
+          } else {
+            api.reload('$131bb7', $131bb7);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"./header.vue":52,"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],53:[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+  name: "Slider",
+  data: function data() {
+    return {
+      currentPage: 0,
+      touchPosition: {}
+    };
+  },
+  computed: {
+    totalPages: function totalPages() {
+      return this.slider.length;
+    },
+    marginLeft: function marginLeft() {
+      return -100 * this.currentPage + "vw";
+    }
+  },
+  props: {
+    slider: {
+      type: Array,
+      default: [],
+      required: true
+    }
+  },
+  methods: {
+    changePage: function changePage(page) {
+      this.currentPage = page;
+    },
+    startScrollBanner: function startScrollBanner() {
+      var _this = this;
+
+      if (this.timer) {
+        return;
+      }
+      this.timer = window.setInterval(function () {
+        _this.changePage((_this.currentPage + 1) % _this.totalPages);
+      }, 5000);
+    },
+    stopScrollBanner: function stopScrollBanner() {
+      if (!this.timer) {
+        return;
+      }
+      clearTimeout(this.timer);
+      this.timer = null;
+    },
+    onTouchStart: function onTouchStart(e) {
+      this.stopScrollBanner();
+      var touch = e.touches[0];
+      this.touchPosition = {
+        x: touch.pageX,
+        y: touch.pageY
       };
     },
-    computed: {
-      totalPages: function totalPages() {
-        return this.slider.length;
-      },
-      marginLeft: function marginLeft() {
-        return -100 * this.currentPage + "vw";
+    onTouchEnd: function onTouchEnd(e) {
+      var touch = e.changedTouches[0],
+          dir = 0;
+      if (touch.pageX - this.touchPosition.x > 20) {
+        dir = -1;
+      } else if (this.touchPosition.x - touch.pageX > 20) {
+        dir = 1;
       }
-    },
-    props: {
-      slider: {
-        type: Array,
-        default: [],
-        required: true
+      if (dir === 0) {
+        return;
       }
-    },
-    methods: {
-      changePage: function changePage(page) {
-        this.currentPage = page;
-      },
-      startScrollBanner: function startScrollBanner() {
-        var _this = this;
-
-        if (this.timer) {
-          return;
-        }
-        this.timer = window.setInterval(function () {
-          _this.changePage((_this.currentPage + 1) % _this.totalPages);
-        }, 5000);
-      },
-      stopScrollBanner: function stopScrollBanner() {
-        if (!this.timer) {
-          return;
-        }
-        clearTimeout(this.timer);
-        this.timer = null;
-      },
-      onTouchStart: function onTouchStart(e) {
-        this.stopScrollBanner();
-        var touch = e.touches[0];
-        this.touchPosition = {
-          x: touch.pageX,
-          y: touch.pageY
-        };
-      },
-      onTouchEnd: function onTouchEnd(e) {
-        var touch = e.changedTouches[0],
-            dir = 0;
-        if (touch.pageX - this.touchPosition.x > 20) {
-          dir = -1;
-        } else if (this.touchPosition.x - touch.pageX > 20) {
-          dir = 1;
-        }
-        if (dir === 0) {
-          return;
-        }
-        this.currentPage = (this.currentPage + dir + this.totalPages) % this.totalPages;
-        this.touchPosition = {};
-        this.startScrollBanner();
-      }
-    },
-    created: function created() {
+      this.currentPage = (this.currentPage + dir + this.totalPages) % this.totalPages;
+      this.touchPosition = {};
       this.startScrollBanner();
     }
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
-}
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { attrs: { "id": "slider-container" } }, [_c('ul', { staticClass: "slider-content", style: { marginLeft: _vm.marginLeft }, on: { "touchstart": function touchstart($event) {
-        $event.preventDefault();return _vm.onTouchStart($event);
-      }, "touchend": _vm.onTouchEnd } }, _vm._l(_vm.slider, function (s) {
-    return _c('li', { staticClass: "slider-item" }, [_c('a', { attrs: { "href": s.link } }, [_c('img', { attrs: { "src": s.pic } })])]);
-  })), _vm._v(" "), _c('div', { staticClass: "page-content" }, _vm._l(_vm.totalPages, function (n) {
-    return _c('span', { staticClass: "page-button", class: { active: n === _vm.currentPage + 1 }, on: { "click": function click($event) {
-          _vm.changePage(n - 1);
-        } } });
-  }))]);
+  },
+  created: function created() {
+    this.startScrollBanner();
+  }
 };
-__vue__options__.staticRenderFns = [];
-__vue__options__._scopeId = "data-v-3e6b9b46";
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-3e6b9b46", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-3e6b9b46", __vue__options__);
-    }
-  })();
+      var $f4bf9e = exports.default || module.exports;
+      if (typeof $f4bf9e === 'function') {
+        $f4bf9e = $f4bf9e.options;
+      }
+    
+        /* template */
+        Object.assign($f4bf9e, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { attrs: { id: "slider-container" } }, [
+    _c(
+      "ul",
+      {
+        staticClass: "slider-content",
+        style: { marginLeft: _vm.marginLeft },
+        on: {
+          touchstart: function($event) {
+            $event.preventDefault()
+            return _vm.onTouchStart($event)
+          },
+          touchend: _vm.onTouchEnd
+        }
+      },
+      _vm._l(_vm.slider, function(s) {
+        return _c("li", { staticClass: "slider-item" }, [
+          _c("a", { attrs: { href: s.link } }, [
+            _c("img", { attrs: { src: s.pic } })
+          ])
+        ])
+      })
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "page-content" },
+      _vm._l(_vm.totalPages, function(n) {
+        return _c("span", {
+          staticClass: "page-button",
+          class: { active: n === _vm.currentPage + 1 },
+          on: {
+            click: function($event) {
+              _vm.changePage(n - 1)
+            }
+          }
+        })
+      })
+    )
+  ])
 }
-},{"vueify/lib/insert-css":44,"vue-hot-reload-api":42,"vue":19}],63:[function(require,module,exports) {
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-f4bf9e",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$f4bf9e', $f4bf9e);
+          } else {
+            api.reload('$f4bf9e', $f4bf9e);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],64:[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -10277,7 +10473,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],92:[function(require,module,exports) {
+},{}],77:[function(require,module,exports) {
 /*!
  * Determine if an object is a Buffer
  *
@@ -10300,7 +10496,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],61:[function(require,module,exports) {
+},{}],62:[function(require,module,exports) {
 'use strict';
 
 var bind = require('./helpers/bind');
@@ -10605,7 +10801,7 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":63,"is-buffer":92}],94:[function(require,module,exports) {
+},{"./helpers/bind":64,"is-buffer":77}],78:[function(require,module,exports) {
 'use strict';
 
 var utils = require('../utils');
@@ -10619,7 +10815,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":61}],137:[function(require,module,exports) {
+},{"../utils":62}],155:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -10642,7 +10838,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],127:[function(require,module,exports) {
+},{}],149:[function(require,module,exports) {
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -10662,7 +10858,7 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":137}],123:[function(require,module,exports) {
+},{"./enhanceError":155}],145:[function(require,module,exports) {
 'use strict';
 
 var createError = require('./createError');
@@ -10690,7 +10886,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":127}],124:[function(require,module,exports) {
+},{"./createError":149}],146:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -10758,7 +10954,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":61}],125:[function(require,module,exports) {
+},{"./../utils":62}],147:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -10813,7 +11009,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":61}],126:[function(require,module,exports) {
+},{"./../utils":62}],148:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -10883,7 +11079,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":61}],128:[function(require,module,exports) {
+},{"./../utils":62}],150:[function(require,module,exports) {
 'use strict';
 
 // btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
@@ -10921,7 +11117,7 @@ function btoa(input) {
 
 module.exports = btoa;
 
-},{}],129:[function(require,module,exports) {
+},{}],151:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -10976,7 +11172,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":61}],95:[function(require,module,exports) {
+},{"./../utils":62}],79:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -11151,7 +11347,7 @@ module.exports = function xhrAdapter(config) {
     request.send(requestData);
   });
 };
-},{"./../utils":61,"./../core/settle":123,"./../helpers/buildURL":124,"./../helpers/parseHeaders":125,"./../helpers/isURLSameOrigin":126,"../core/createError":127,"./../helpers/btoa":128,"./../helpers/cookies":129}],93:[function(require,module,exports) {
+},{"./../utils":62,"./../core/settle":145,"./../helpers/buildURL":146,"./../helpers/parseHeaders":147,"./../helpers/isURLSameOrigin":148,"../core/createError":149,"./../helpers/btoa":150,"./../helpers/cookies":151}],80:[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {};
@@ -11338,7 +11534,7 @@ process.chdir = function (dir) {
 process.umask = function () {
     return 0;
 };
-},{}],62:[function(require,module,exports) {
+},{}],63:[function(require,module,exports) {
 var process = require("process");
 'use strict';
 
@@ -11437,7 +11633,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-},{"./utils":61,"./helpers/normalizeHeaderName":94,"./adapters/xhr":95,"./adapters/http":95,"process":93}],104:[function(require,module,exports) {
+},{"./utils":62,"./helpers/normalizeHeaderName":78,"./adapters/xhr":79,"./adapters/http":79,"process":80}],81:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -11491,7 +11687,7 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":61}],132:[function(require,module,exports) {
+},{"./../utils":62}],152:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -11513,14 +11709,14 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":61}],67:[function(require,module,exports) {
+},{"./../utils":62}],68:[function(require,module,exports) {
 'use strict';
 
 module.exports = function isCancel(value) {
   return !!(value && value.__CANCEL__);
 };
 
-},{}],133:[function(require,module,exports) {
+},{}],153:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -11536,7 +11732,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],134:[function(require,module,exports) {
+},{}],154:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -11552,7 +11748,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],105:[function(require,module,exports) {
+},{}],82:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./../utils');
@@ -11640,7 +11836,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"./../utils":61,"./transformData":132,"../cancel/isCancel":67,"../defaults":62,"./../helpers/isAbsoluteURL":133,"./../helpers/combineURLs":134}],64:[function(require,module,exports) {
+},{"./../utils":62,"./transformData":152,"../cancel/isCancel":68,"../defaults":63,"./../helpers/isAbsoluteURL":153,"./../helpers/combineURLs":154}],65:[function(require,module,exports) {
 'use strict';
 
 var defaults = require('./../defaults');
@@ -11721,7 +11917,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"./../defaults":62,"./../utils":61,"./InterceptorManager":104,"./dispatchRequest":105}],66:[function(require,module,exports) {
+},{"./../defaults":63,"./../utils":62,"./InterceptorManager":81,"./dispatchRequest":82}],66:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -11742,7 +11938,7 @@ Cancel.prototype.__CANCEL__ = true;
 
 module.exports = Cancel;
 
-},{}],65:[function(require,module,exports) {
+},{}],67:[function(require,module,exports) {
 'use strict';
 
 var Cancel = require('./Cancel');
@@ -11801,7 +11997,7 @@ CancelToken.source = function source() {
 
 module.exports = CancelToken;
 
-},{"./Cancel":66}],68:[function(require,module,exports) {
+},{"./Cancel":66}],69:[function(require,module,exports) {
 'use strict';
 
 /**
@@ -11830,7 +12026,7 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],48:[function(require,module,exports) {
+},{}],60:[function(require,module,exports) {
 'use strict';
 
 var utils = require('./utils');
@@ -11884,377 +12080,825 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./utils":61,"./helpers/bind":63,"./core/Axios":64,"./defaults":62,"./cancel/Cancel":66,"./cancel/CancelToken":65,"./cancel/isCancel":67,"./helpers/spread":68}],43:[function(require,module,exports) {
+},{"./utils":62,"./helpers/bind":64,"./core/Axios":65,"./defaults":63,"./cancel/Cancel":66,"./cancel/CancelToken":67,"./cancel/isCancel":68,"./helpers/spread":69}],58:[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":48}],38:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".tabs-container[data-v-14f86ea3]{\n  display: flex;\n  height: 40px;\n  line-height: 40px;\n  background: #fdfdfd;\n  \n}\n.tab-button[data-v-14f86ea3]{\n  flex: 1;\n  font-size: 16px;\n  text-align: center;\n  border-box: border-content;\n  color:#4c5475;\n}\n.tab-button.router-link-active[data-v-14f86ea3]{\n  color: #818FAF;\n  border-bottom: 2px solid #818FAF;\n}");(function () {
-  "use strict";
+},{"./lib/axios":60}],54:[function(require,module,exports) {
+"use strict";
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = {
-    name: "Tabs"
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
-}
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "tabs-container" }, [_c('router-link', { staticClass: "tab-button", attrs: { "to": "/home" } }, [_vm._v("首页")]), _vm._v(" "), _c('router-link', { staticClass: "tab-button", attrs: { "to": "/toplist" } }, [_vm._v("榜单")]), _vm._v(" "), _c('router-link', { staticClass: "tab-button", attrs: { "to": "/search" } }, [_vm._v("搜索")])], 1);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+  name: "Tabs"
 };
-__vue__options__.staticRenderFns = [];
-__vue__options__._scopeId = "data-v-14f86ea3";
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-14f86ea3", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-14f86ea3", __vue__options__);
-    }
-  })();
-}
-},{"vueify/lib/insert-css":44,"vue-hot-reload-api":42,"vue":19}],9:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("h1[data-v-2d019784]{\n  font-size: 20px;\n}\n.radio-container[data-v-2d019784]{\n  margin: 10px;\n}\n.radio-container h3[data-v-2d019784]{\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.radio-list[data-v-2d019784]{\n  display: flex;\n}\n.radio-block+.radio-block[data-v-2d019784]{\n  margin-left: 10px;\n}\n.radio-block[data-v-2d019784]{\n  flex: 1;\n}\n.radio-block img[data-v-2d019784]{\n  width: 100%;\n}\n.radio-block .title[data-v-2d019784]{\n  height: 30px;\n  padding:10px;\n  background: #fff;\n  font-size: 14px;\n}");(function () {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _slider = require('./slider.vue');
-
-  var _slider2 = _interopRequireDefault(_slider);
-
-  var _axios = require('axios');
-
-  var _axios2 = _interopRequireDefault(_axios);
-
-  var _tabs = require('./tabs.vue');
-
-  var _tabs2 = _interopRequireDefault(_tabs);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
-  }
-
-  exports.default = {
-    name: "Home",
-    components: {
-      Slider: _slider2.default,
-      Tabs: _tabs2.default
-    },
-    data: function data() {
-      return {
-        radioList: [],
-        slider: []
-      };
-    },
-    created: function created() {
-      var _this = this;
-
-      _axios2.default.get("/api/index_slider").then(function (res) {
-        return res.data;
-      }).then(function (data) {
-        _this.radioList = data.radioList, _this.slider = data.slider.map(function (s) {
-          return {
-            link: s.linkUrl,
-            pic: s.picUrl
-          };
-        });
-      }, function (error) {
-        alert(error);
-      });
-    }
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
-}
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('Slider', { attrs: { "slider": _vm.slider } }), _vm._v(" "), _c('div', { staticClass: "radio-container" }, [_c('h3', [_vm._v("电台")]), _vm._v(" "), _c('div', { staticClass: "radio-list" }, [_c('div', { staticClass: "radio-block" }, [_c('img', { attrs: { "src": _vm.radioList[0] && _vm.radioList[0].picUrl } }), _vm._v(" "), _c('div', { staticClass: "title" }, [_c('p', [_vm._v(_vm._s(_vm.radioList[0] && _vm.radioList[0].Ftitle))])])]), _vm._v(" "), _c('div', { staticClass: "radio-block" }, [_c('img', { attrs: { "src": _vm.radioList[1] && _vm.radioList[1].picUrl } }), _vm._v(" "), _c('div', { staticClass: "title" }, [_c('p', [_vm._v(_vm._s(_vm.radioList[1] && _vm.radioList[1].Ftitle))])])])])])], 1);
-};
-__vue__options__.staticRenderFns = [];
-__vue__options__._scopeId = "data-v-2d019784";
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-2d019784", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-2d019784", __vue__options__);
-    }
-  })();
-}
-},{"vueify/lib/insert-css":44,"./slider.vue":37,"axios":43,"./tabs.vue":38,"vue-hot-reload-api":42,"vue":19}],11:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert("#toplist-container[data-v-26b8c1de]{\n  padding: 10px;\n  background: #d1d7e1;\n}\n.list-item[data-v-26b8c1de]{\n  display: flex;\n  background: #fdfdfd;\n  box-shadow: 0 0 10px rgba(0,0,0,0.2);\n}\n.list-item + .list-item[data-v-26b8c1de]{\n  margin-top: 10px;\n}\n.list-item .img-block[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n  overflow: hidden;\n}\n.img-block img[data-v-26b8c1de]{\n  height: 100px;\n  width: 100px;\n}\n.content-block[data-v-26b8c1de]{\n  padding: 10px;\n  flex: 1;\n  overflow: hidden;\n  box-sizing: border-box;\n}\n.content-block h3[data-v-26b8c1de]{\n  font-size: 16px;\n  margin-bottom: 5px;\n}\n.content-block li[data-v-26b8c1de]{\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow:ellipsis;\n}\n.content-block li .number[data-v-26b8c1de], .content-block li .singer[data-v-26b8c1de]{\n  color: #99A1B4;\n}\n.view-more[data-v-26b8c1de]{\n  fonr-size: 16px;\n  text-align: center;\n  color: #4c5475;\n  padding: 20px 0 10px;\n}");(function () {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _axios = require('axios');
-
-  var _axios2 = _interopRequireDefault(_axios);
-
-  var _tabs = require('./tabs.vue');
-
-  var _tabs2 = _interopRequireDefault(_tabs);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
-  }
-
-  exports.default = {
-    name: "Toplist",
-    data: function data() {
-      return {
-        list: []
-      };
-    },
-    components: {
-      Tabs: _tabs2.default
-    },
-    created: function created() {
-      var _this = this;
-
-      _axios2.default.get("/api/top_list").then(function (res) {
-        return res.data;
-      }).then(function (data) {
-        _this.list = data && data.data && data.data.topList;
-      }, function (error) {
-        console.log(error);
-      });
-    },
-    methods: {
-      turnToTopicPage: function turnToTopicPage(id) {
-        this.$router.push('/topiclist/' + id);
+      var $ee2da7 = exports.default || module.exports;
+      if (typeof $ee2da7 === 'function') {
+        $ee2da7 = $ee2da7.options;
       }
-    }
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
+    
+        /* template */
+        Object.assign($ee2da7, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "tabs-container" },
+    [
+      _c("router-link", { staticClass: "tab-button", attrs: { to: "/home" } }, [
+        _vm._v("首页")
+      ]),
+      _vm._v(" "),
+      _c(
+        "router-link",
+        { staticClass: "tab-button", attrs: { to: "/toplist" } },
+        [_vm._v("榜单")]
+      ),
+      _vm._v(" "),
+      _c(
+        "router-link",
+        { staticClass: "tab-button", attrs: { to: "/search" } },
+        [_vm._v("搜索")]
+      )
+    ],
+    1
+  )
 }
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('div', { attrs: { "id": "toplist-container" } }, [_c('ul', { staticClass: "list" }, _vm._l(_vm.list, function (item) {
-    return _c('li', { staticClass: "list-item", on: { "click": function click($event) {
-          _vm.turnToTopicPage(item.id);
-        } } }, [_c('div', { staticClass: "img-block" }, [_c('img', { attrs: { "src": item.picUrl } })]), _vm._v(" "), _c('div', { staticClass: "content-block" }, [_c('h3', [_vm._v(_vm._s(item.topTitle))]), _vm._v(" "), _c('ul', { staticClass: "song-list" }, _vm._l(item.songList, function (s, index) {
-      return _c('li', { attrs: { "title": s.songname } }, [_c('span', { staticClass: "number" }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c('span', { staticClass: "name" }, [_vm._v(_vm._s(s.songname))]), _vm._v(" "), _c('span', { staticClass: "singer" }, [_vm._v(_vm._s(s.singername))])]);
-    }))])]);
-  })), _vm._v(" "), _c('div', { staticClass: "view-more" }, [_vm._v("去客户端发现更多好音乐>")])])]);
-};
-__vue__options__.staticRenderFns = [];
-__vue__options__._scopeId = "data-v-26b8c1de";
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-26b8c1de", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-26b8c1de", __vue__options__);
-    }
-  })();
-}
-},{"vueify/lib/insert-css":44,"axios":43,"./tabs.vue":38,"vue-hot-reload-api":42,"vue":19}],13:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".search-block[data-v-5bb866e6]{\n  padding: 10px;\n  display: flex;\n  color: #818FAF;\n  background: #d1d7e1;\n}\n.search-wrapper[data-v-5bb866e6]{\n  flex: 1;\n  padding: 5px;\n  background: #fdfdfd;\n  display: flex;\n}\n.search-block i[data-v-5bb866e6]{\n  font-size: 20px;\n}\n.search-block .icon-search[data-v-5bb866e6]{\n  margin-right: 5px;\n}\n.search-block .icon-close-border[data-v-5bb866e6]{\n  margin-left: 5px;\n}\n.search-block input[data-v-5bb866e6]{\n  flex: 1;\n  line-height: 20px;\n  outline: none;\n  border: none;\n}\n.search-block .cancel[data-v-5bb866e6]{\n  border: none;\n  background: none;\n  outline: none;\n  margin-left: 10px;\n}\n.search-content[data-v-5bb866e6]{\n  box-sizing: border-box;\n  padding: 10px;\n  background: #fdfdfd;\n}\n.search-content h2[data-v-5bb866e6]{\n  font-size: 16px;\n}\n.search-content .keys-block[data-v-5bb866e6]{\n  margin: 10px 0;\n}\n.keys-block .key[data-v-5bb866e6]{\n  font-size: 14px;\n  display: inline-block;\n  padding: 4px 10px;\n  border: 1px solid;\n  border-radius: 20px;\n  margin: 0 8px 10px 0;\n  color: rgba(0,0,0,0.7);\n}\n.search-history-item[data-v-5bb866e6]{\n  font-size: 14px;\n  padding: 10px 0;\n}\n.search-history-item + .search-history-item[data-v-5bb866e6]{\n  border-top: 1px solid #d1d7e1;\n}\n.icon-close[data-v-5bb866e6]{\n  float: right;\n}\n.search-history-clean[data-v-5bb866e6]{\n  padding: 10px 0;\n  color: #4c5475;\n  text-align: center;\n}\n.no-result[data-v-5bb866e6]{\n  text-align: center;\n  padding: 40% 0;\n  color: #4c5475;\n}\n.song-item[data-v-5bb866e6]{\n  display: flex;\n}\n.music-logo[data-v-5bb866e6]{\n  width: 40px;\n}\n.icon-music[data-v-5bb866e6]{\n  font-size: 32px;\n}\n.song-item[data-v-5bb866e6]{\n  padding: 10px 0;\n}\n.song-item + .song-item[data-v-5bb866e6]{\n  border-top: 1px solid #d1d7e1; \n}\n.song-item .content[data-v-5bb866e6]{\n  position: relative;\n  overflow: hidden;\n}\n.song-item .name[data-v-5bb866e6]{\n  font-size: 14px;\n  overflow: hidden;\n  text-overflow:ellipsis;\n  white-space:nowrap;\n}\n.singer[data-v-5bb866e6] {\n  color: #818faf;\n}\n.hidden[data-v-5bb866e6]{\n  display: none;\n}");(function () {
-  'use strict';
+var staticRenderFns = []
+render._withStripped = true
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-ee2da7",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$ee2da7', $ee2da7);
+          } else {
+            api.reload('$ee2da7', $ee2da7);
+          }
+        }
 
-  var _axios = require('axios');
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],9:[function(require,module,exports) {
+'use strict';
 
-  var _axios2 = _interopRequireDefault(_axios);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-  var _tabs = require('./tabs.vue');
+var _slider = require('./slider.vue');
 
-  var _tabs2 = _interopRequireDefault(_tabs);
+var _slider2 = _interopRequireDefault(_slider);
 
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
+var _axios = require('axios');
+
+var _axios2 = _interopRequireDefault(_axios);
+
+var _tabs = require('./tabs.vue');
+
+var _tabs2 = _interopRequireDefault(_tabs);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+  name: "Home",
+  components: {
+    Slider: _slider2.default,
+    Tabs: _tabs2.default
+  },
+  data: function data() {
+    return {
+      radioList: [],
+      slider: []
+    };
+  },
+  created: function created() {
+    var _this = this;
+
+    _axios2.default.get("/api/index_slider").then(function (res) {
+      return res.data;
+    }).then(function (data) {
+      _this.radioList = data.radioList, _this.slider = data.slider.map(function (s) {
+        return {
+          link: s.linkUrl,
+          pic: s.picUrl
+        };
+      });
+    }, function (error) {
+      alert(error);
+    });
   }
+}; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+      var $570e6c = exports.default || module.exports;
+      if (typeof $570e6c === 'function') {
+        $570e6c = $570e6c.options;
+      }
+    
+        /* template */
+        Object.assign($570e6c, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c("Slider", { attrs: { slider: _vm.slider } }),
+      _vm._v(" "),
+      _c("div", { staticClass: "radio-container" }, [
+        _c("h3", [_vm._v("电台")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "radio-list" }, [
+          _c("div", { staticClass: "radio-block" }, [
+            _c("img", {
+              attrs: { src: _vm.radioList[0] && _vm.radioList[0].picUrl }
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "title" }, [
+              _c("p", [
+                _vm._v(_vm._s(_vm.radioList[0] && _vm.radioList[0].Ftitle))
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "radio-block" }, [
+            _c("img", {
+              attrs: { src: _vm.radioList[1] && _vm.radioList[1].picUrl }
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "title" }, [
+              _c("p", [
+                _vm._v(_vm._s(_vm.radioList[1] && _vm.radioList[1].Ftitle))
+              ])
+            ])
+          ])
+        ])
+      ])
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
 
-  exports.default = {
-    name: "Search",
-    components: {
-      Tabs: _tabs2.default
-    },
-    data: function data() {
-      return {
-        hotKeys: [],
-        searchHistory: [],
-        searchResults: {},
-        keyword: "",
-        searching: false
-      };
-    },
-    created: function created() {
-      var _this = this;
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-570e6c",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$570e6c', $570e6c);
+          } else {
+            api.reload('$570e6c', $570e6c);
+          }
+        }
 
-      this.searchHistory = this.getSearchHistory();
-      _axios2.default.get("/api/hot_key").then(function (res) {
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"./slider.vue":53,"axios":58,"./tabs.vue":54,"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],11:[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _axios = require('axios');
+
+var _axios2 = _interopRequireDefault(_axios);
+
+var _tabs = require('./tabs.vue');
+
+var _tabs2 = _interopRequireDefault(_tabs);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+  name: "Toplist",
+  data: function data() {
+    return {
+      list: []
+    };
+  },
+  components: {
+    Tabs: _tabs2.default
+  },
+  created: function created() {
+    var _this = this;
+
+    _axios2.default.get("/api/top_list").then(function (res) {
+      return res.data;
+    }).then(function (data) {
+      _this.list = data && data.data && data.data.topList;
+    }, function (error) {
+      console.log(error);
+    });
+  },
+  methods: {
+    turnToTopicPage: function turnToTopicPage(id) {
+      this.$router.push('/topiclist/' + id);
+    }
+  }
+};
+      var $14a546 = exports.default || module.exports;
+      if (typeof $14a546 === 'function') {
+        $14a546 = $14a546.options;
+      }
+    
+        /* template */
+        Object.assign($14a546, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("div", { attrs: { id: "toplist-container" } }, [
+      _c(
+        "ul",
+        { staticClass: "list" },
+        _vm._l(_vm.list, function(item) {
+          return _c(
+            "li",
+            {
+              staticClass: "list-item",
+              on: {
+                click: function($event) {
+                  _vm.turnToTopicPage(item.id)
+                }
+              }
+            },
+            [
+              _c("div", { staticClass: "img-block" }, [
+                _c("img", { attrs: { src: item.picUrl } })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "content-block" }, [
+                _c("h3", [_vm._v(_vm._s(item.topTitle))]),
+                _vm._v(" "),
+                _c(
+                  "ul",
+                  { staticClass: "song-list" },
+                  _vm._l(item.songList, function(s, index) {
+                    return _c("li", { attrs: { title: s.songname } }, [
+                      _c("span", { staticClass: "number" }, [
+                        _vm._v(_vm._s(index + 1))
+                      ]),
+                      _vm._v(" "),
+                      _c("span", { staticClass: "name" }, [
+                        _vm._v(_vm._s(s.songname))
+                      ]),
+                      _vm._v(" "),
+                      _c("span", { staticClass: "singer" }, [
+                        _vm._v(_vm._s(s.singername))
+                      ])
+                    ])
+                  })
+                )
+              ])
+            ]
+          )
+        })
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "view-more" }, [
+        _vm._v("去客户端发现更多好音乐>")
+      ])
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-14a546",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$14a546', $14a546);
+          } else {
+            api.reload('$14a546', $14a546);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"axios":58,"./tabs.vue":54,"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],13:[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _axios = require('axios');
+
+var _axios2 = _interopRequireDefault(_axios);
+
+var _tabs = require('./tabs.vue');
+
+var _tabs2 = _interopRequireDefault(_tabs);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+  name: "Search",
+  components: {
+    Tabs: _tabs2.default
+  },
+  data: function data() {
+    return {
+      hotKeys: [],
+      searchHistory: [],
+      searchResults: {},
+      keyword: "",
+      searching: false
+    };
+  },
+  created: function created() {
+    var _this = this;
+
+    this.searchHistory = this.getSearchHistory();
+    _axios2.default.get("/api/hot_key").then(function (res) {
+      return res.data;
+    }).then(function (data) {
+      _this.hotKeys = data && data.data && data.data.hotkey && data.data.hotkey.slice(0, 12);
+    }, function (error) {
+      console.log(error);
+    });
+  },
+  methods: {
+    getSearchResults: function getSearchResults(params) {
+      var _this2 = this;
+
+      _axios2.default.get("/api/search", {
+        params: params
+      }).then(function (res) {
         return res.data;
       }).then(function (data) {
-        _this.hotKeys = data && data.data && data.data.hotkey && data.data.hotkey.slice(0, 12);
-      }, function (error) {
+        _this2.searchResults = data && data.data;
+        return data && data.data;
+      }).then(function (data) {
+        if (data) {
+          _this2.storeSearchHistory(data.keyword);
+        }
+      }).catch(function (error) {
         console.log(error);
       });
     },
-    methods: {
-      getSearchResults: function getSearchResults(params) {
-        var _this2 = this;
-
-        _axios2.default.get("/api/search", {
-          params: params
-        }).then(function (res) {
-          return res.data;
-        }).then(function (data) {
-          _this2.searchResults = data && data.data;
-          return data && data.data;
-        }).then(function (data) {
-          if (data) {
-            _this2.storeSearchHistory(data.keyword);
-          }
-        }).catch(function (error) {
-          console.log(error);
-        });
-      },
-      setKeyword: function setKeyword(keyword) {
-        this.keyword = keyword;
-      },
-      searchFromHistory: function searchFromHistory(keyword) {
-        this.searching = true;
-        this.setKeyword(keyword);
-        this.getSearchResults({ key: keyword, p: 1, perpage: 10 });
-      },
-      inputKeyword: function inputKeyword(e) {
-        if (e.key === "Enter" && this.keyword) {
-          this.getSearchResults({ key: this.keyword, p: 1, perpage: 10 });
-        }
-      },
-      cleanAllSearchHistory: function cleanAllSearchHistory() {
-        this.searchHistory = [];
+    setKeyword: function setKeyword(keyword) {
+      this.keyword = keyword;
+    },
+    searchFromHistory: function searchFromHistory(keyword) {
+      this.searching = true;
+      this.setKeyword(keyword);
+      this.getSearchResults({ key: keyword, p: 1, perpage: 10 });
+    },
+    inputKeyword: function inputKeyword(e) {
+      if (e.key === "Enter" && this.keyword) {
+        this.getSearchResults({ key: this.keyword, p: 1, perpage: 10 });
+      }
+    },
+    cleanAllSearchHistory: function cleanAllSearchHistory() {
+      this.searchHistory = [];
+      if (localStorage) {
+        localStorage.removeItem("search");
+      }
+    },
+    storeSearchHistory: function storeSearchHistory(keyword) {
+      if (this.searchHistory.indexOf(keyword) === -1) {
+        this.searchHistory = this.searchHistory.concat(keyword);
         if (localStorage) {
-          localStorage.removeItem("search");
-        }
-      },
-      storeSearchHistory: function storeSearchHistory(keyword) {
-        if (this.searchHistory.indexOf(keyword) === -1) {
-          this.searchHistory = this.searchHistory.concat(keyword);
-          if (localStorage) {
-            localStorage.setItem("search", this.searchHistory.join(","));
-          }
-        }
-      },
-      getSearchHistory: function getSearchHistory() {
-        if (localStorage) {
-          var search_history = localStorage.getItem("search");
-          if (search_history) {
-            return search_history.split(",");
-          } else {
-            return [];
-          }
-        }
-        return [];
-      },
-      removeSearchHistory: function removeSearchHistory(keyword) {
-        if (this.searchHistory.indexOf(keyword) > -1) {
-          this.searchHistory = this.searchHistory.filter(function (k) {
-            return k !== keyword;
-          });
           localStorage.setItem("search", this.searchHistory.join(","));
         }
-      },
-      setSearching: function setSearching(searching) {
-        this.searching = searching;
-        if (!searching) {
-          this.searchResults = {};
-        }
-      },
-      turnToSingleSong: function turnToSingleSong(songmid) {
-        this.$router.push("/song?song_id=" + songmid);
       }
+    },
+    getSearchHistory: function getSearchHistory() {
+      if (localStorage) {
+        var search_history = localStorage.getItem("search");
+        if (search_history) {
+          return search_history.split(",");
+        } else {
+          return [];
+        }
+      }
+      return [];
+    },
+    removeSearchHistory: function removeSearchHistory(keyword) {
+      if (this.searchHistory.indexOf(keyword) > -1) {
+        this.searchHistory = this.searchHistory.filter(function (k) {
+          return k !== keyword;
+        });
+        localStorage.setItem("search", this.searchHistory.join(","));
+      }
+    },
+    setSearching: function setSearching(searching) {
+      this.searching = searching;
+      if (!searching) {
+        this.searchResults = {};
+      }
+    },
+    turnToSingleSong: function turnToSingleSong(songmid) {
+      this.$router.push("/song?song_id=" + songmid);
     }
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
-}
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', [_c('div', { staticClass: "search-container" }, [_c('div', { staticClass: "search-block" }, [_c('div', { staticClass: "search-wrapper" }, [_c('i', { staticClass: "iconfont icon-search" }), _vm._v(" "), _c('input', { directives: [{ name: "model", rawName: "v-model", value: _vm.keyword, expression: "keyword" }], attrs: { "type": "text", "placeholder": "搜索歌曲、歌单、专辑" }, domProps: { "value": _vm.keyword }, on: { "focus": function focus($event) {
-        _vm.setSearching(true);
-      }, "keydown": _vm.inputKeyword, "input": function input($event) {
-        if ($event.target.composing) {
-          return;
-        }_vm.keyword = $event.target.value;
-      } } }), _vm._v(" "), _c('i', { staticClass: "iconfont icon-close-border", class: { hidden: !_vm.searching || _vm.keyword.length === 0 }, on: { "click": function click($event) {
-        _vm.setKeyword('');
-      } } })]), _vm._v(" "), _c('button', { staticClass: "cancel", class: { hidden: !_vm.searching }, on: { "click": function click($event) {
-        _vm.setSearching(false);
-      } } }, [_vm._v("取消")])]), _vm._v(" "), _c('div', { staticClass: "search-content" }, [_c('div', { staticClass: "keys", class: { hidden: _vm.searching } }, [_c('h2', [_vm._v("热门搜索")]), _vm._v(" "), _c('div', { staticClass: "keys-block" }, _vm._l(_vm.hotKeys, function (k) {
-    return _c('span', { staticClass: "key", on: { "click": function click($event) {
-          _vm.searchFromHistory(k.k);
-        } } }, [_vm._v(_vm._s(k.k))]);
-  }))]), _vm._v(" "), _c('ul', { staticClass: "search-history", class: { hidden: !(_vm.searching && !_vm.searchResults.keyword) } }, [_vm._l(_vm.searchHistory, function (s) {
-    return _c('li', { staticClass: "search-history-item", on: { "click": function click($event) {
-          _vm.searchFromHistory(s);
-        } } }, [_vm._v(_vm._s(s) + " "), _c('i', { staticClass: "iconfont icon-close", on: { "click": function click($event) {
-          $event.stopPropagation();_vm.removeSearchHistory(s);
-        } } })]);
-  }), _vm._v(" "), _c('li', { staticClass: "search-history-clean", class: { hidden: !_vm.searching || _vm.searchHistory.length === 0 }, on: { "click": _vm.cleanAllSearchHistory } }, [_vm._v("清除搜索记录")])], 2), _vm._v(" "), _c('div', { staticClass: "no-result", class: { hidden: !(_vm.searchResults.keyword && (!_vm.searchResults.song || _vm.searchResults.song.totalnum === 0)) } }, [_c('p', [_vm._v("抱歉，没有找到与”" + _vm._s(this.keyword) + "“相关的结果。")])]), _vm._v(" "), _c('ul', { staticClass: "song-list" }, _vm._l(_vm.searchResults.song && _vm.searchResults.song.list, function (s) {
-    return _c('li', { staticClass: "song-item", on: { "click": function click($event) {
-          _vm.turnToSingleSong(s.songmid);
-        } } }, [_vm._m(0, true), _vm._v(" "), _c('div', { staticClass: "content" }, [_c('p', { staticClass: "name", domProps: { "innerHTML": _vm._s(s.songname) } }), _vm._v(" "), _c('p', { staticClass: "singer" }, _vm._l(s.singer, function (p) {
-      return _c('span', { domProps: { "innerHTML": _vm._s(p.name) } });
-    }))])]);
-  }))])])]);
+  }
 };
-__vue__options__.staticRenderFns = [function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "music-logo" }, [_c('i', { staticClass: "iconfont icon-music" })]);
-}];
-__vue__options__._scopeId = "data-v-5bb866e6";
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-5bb866e6", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-5bb866e6", __vue__options__);
-    }
-  })();
+      var $a556ac = exports.default || module.exports;
+      if (typeof $a556ac === 'function') {
+        $a556ac = $a556ac.options;
+      }
+    
+        /* template */
+        Object.assign($a556ac, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("div", { staticClass: "search-container" }, [
+      _c("div", { staticClass: "search-block" }, [
+        _c("div", { staticClass: "search-wrapper" }, [
+          _c("i", { staticClass: "iconfont icon-search" }),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.keyword,
+                expression: "keyword"
+              }
+            ],
+            attrs: { type: "text", placeholder: "搜索歌曲、歌单、专辑" },
+            domProps: { value: _vm.keyword },
+            on: {
+              focus: function($event) {
+                _vm.setSearching(true)
+              },
+              keydown: _vm.inputKeyword,
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.keyword = $event.target.value
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("i", {
+            staticClass: "iconfont icon-close-border",
+            class: { hidden: !_vm.searching || _vm.keyword.length === 0 },
+            on: {
+              click: function($event) {
+                _vm.setKeyword("")
+              }
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "cancel",
+            class: { hidden: !_vm.searching },
+            on: {
+              click: function($event) {
+                _vm.setSearching(false)
+              }
+            }
+          },
+          [_vm._v("取消")]
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "search-content" }, [
+        _c("div", { staticClass: "keys", class: { hidden: _vm.searching } }, [
+          _c("h2", [_vm._v("热门搜索")]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "keys-block" },
+            _vm._l(_vm.hotKeys, function(k) {
+              return _c(
+                "span",
+                {
+                  staticClass: "key",
+                  on: {
+                    click: function($event) {
+                      _vm.searchFromHistory(k.k)
+                    }
+                  }
+                },
+                [_vm._v(_vm._s(k.k))]
+              )
+            })
+          )
+        ]),
+        _vm._v(" "),
+        _c(
+          "ul",
+          {
+            staticClass: "search-history",
+            class: { hidden: !(_vm.searching && !_vm.searchResults.keyword) }
+          },
+          [
+            _vm._l(_vm.searchHistory, function(s) {
+              return _c(
+                "li",
+                {
+                  staticClass: "search-history-item",
+                  on: {
+                    click: function($event) {
+                      _vm.searchFromHistory(s)
+                    }
+                  }
+                },
+                [
+                  _vm._v(_vm._s(s) + " "),
+                  _c("i", {
+                    staticClass: "iconfont icon-close",
+                    on: {
+                      click: function($event) {
+                        $event.stopPropagation()
+                        _vm.removeSearchHistory(s)
+                      }
+                    }
+                  })
+                ]
+              )
+            }),
+            _vm._v(" "),
+            _c(
+              "li",
+              {
+                staticClass: "search-history-clean",
+                class: {
+                  hidden: !_vm.searching || _vm.searchHistory.length === 0
+                },
+                on: { click: _vm.cleanAllSearchHistory }
+              },
+              [_vm._v("清除搜索记录")]
+            )
+          ],
+          2
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "no-result",
+            class: {
+              hidden: !(
+                _vm.searchResults.keyword &&
+                (!_vm.searchResults.song ||
+                  _vm.searchResults.song.totalnum === 0)
+              )
+            }
+          },
+          [
+            _c("p", [
+              _vm._v(
+                "抱歉，没有找到与”" + _vm._s(this.keyword) + "“相关的结果。"
+              )
+            ])
+          ]
+        ),
+        _vm._v(" "),
+        _c(
+          "ul",
+          { staticClass: "song-list" },
+          _vm._l(
+            _vm.searchResults.song && _vm.searchResults.song.list,
+            function(s) {
+              return _c(
+                "li",
+                {
+                  staticClass: "song-item",
+                  on: {
+                    click: function($event) {
+                      _vm.turnToSingleSong(s.songmid)
+                    }
+                  }
+                },
+                [
+                  _vm._m(0, true),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "content" }, [
+                    _c("p", {
+                      staticClass: "name",
+                      domProps: { innerHTML: _vm._s(s.songname) }
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "p",
+                      { staticClass: "singer" },
+                      _vm._l(s.singer, function(p) {
+                        return _c("span", {
+                          domProps: { innerHTML: _vm._s(p.name) }
+                        })
+                      })
+                    )
+                  ])
+                ]
+              )
+            }
+          )
+        )
+      ])
+    ])
+  ])
 }
-},{"vueify/lib/insert-css":44,"axios":43,"./tabs.vue":38,"vue-hot-reload-api":42,"vue":19}],49:[function(require,module,exports) {
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "music-logo" }, [
+      _c("i", { staticClass: "iconfont icon-music" })
+    ])
+  }
+]
+render._withStripped = true
 
-},{}],102:[function(require,module,exports) {
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-a556ac",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$a556ac', $a556ac);
+          } else {
+            api.reload('$a556ac', $a556ac);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"axios":58,"./tabs.vue":54,"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],70:[function(require,module,exports) {
+
+},{}],109:[function(require,module,exports) {
 // 7.1.4 ToInteger
 var ceil = Math.ceil;
 var floor = Math.floor;
@@ -12262,14 +12906,14 @@ module.exports = function (it) {
   return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
 };
 
-},{}],103:[function(require,module,exports) {
+},{}],110:[function(require,module,exports) {
 // 7.2.1 RequireObjectCoercible(argument)
 module.exports = function (it) {
   if (it == undefined) throw TypeError("Can't call method on  " + it);
   return it;
 };
 
-},{}],71:[function(require,module,exports) {
+},{}],83:[function(require,module,exports) {
 var toInteger = require('./_to-integer');
 var defined = require('./_defined');
 // true  -> String#at
@@ -12288,10 +12932,10 @@ module.exports = function (TO_STRING) {
   };
 };
 
-},{"./_to-integer":102,"./_defined":103}],74:[function(require,module,exports) {
+},{"./_to-integer":109,"./_defined":110}],90:[function(require,module,exports) {
 module.exports = true;
 
-},{}],57:[function(require,module,exports) {
+},{}],86:[function(require,module,exports) {
 
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
@@ -12300,17 +12944,17 @@ var global = module.exports = typeof window != 'undefined' && window.Math == Mat
   : Function('return this')();
 if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 
-},{}],55:[function(require,module,exports) {
-var core = module.exports = { version: '2.5.5' };
+},{}],76:[function(require,module,exports) {
+var core = module.exports = { version: '2.5.6' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
-},{}],78:[function(require,module,exports) {
+},{}],95:[function(require,module,exports) {
 module.exports = function (it) {
   if (typeof it != 'function') throw TypeError(it + ' is not a function!');
   return it;
 };
 
-},{}],75:[function(require,module,exports) {
+},{}],91:[function(require,module,exports) {
 // optional / simple context binding
 var aFunction = require('./_a-function');
 module.exports = function (fn, that, length) {
@@ -12332,19 +12976,19 @@ module.exports = function (fn, that, length) {
   };
 };
 
-},{"./_a-function":78}],77:[function(require,module,exports) {
+},{"./_a-function":95}],94:[function(require,module,exports) {
 module.exports = function (it) {
   return typeof it === 'object' ? it !== null : typeof it === 'function';
 };
 
-},{}],106:[function(require,module,exports) {
+},{}],123:[function(require,module,exports) {
 var isObject = require('./_is-object');
 module.exports = function (it) {
   if (!isObject(it)) throw TypeError(it + ' is not an object!');
   return it;
 };
 
-},{"./_is-object":77}],118:[function(require,module,exports) {
+},{"./_is-object":94}],136:[function(require,module,exports) {
 module.exports = function (exec) {
   try {
     return !!exec();
@@ -12353,13 +12997,13 @@ module.exports = function (exec) {
   }
 };
 
-},{}],100:[function(require,module,exports) {
+},{}],119:[function(require,module,exports) {
 // Thank's IE8 for his funny defineProperty
 module.exports = !require('./_fails')(function () {
   return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
 });
 
-},{"./_fails":118}],117:[function(require,module,exports) {
+},{"./_fails":136}],128:[function(require,module,exports) {
 var isObject = require('./_is-object');
 var document = require('./_global').document;
 // typeof document.createElement is 'object' in old IE
@@ -12368,12 +13012,12 @@ module.exports = function (it) {
   return is ? document.createElement(it) : {};
 };
 
-},{"./_is-object":77,"./_global":57}],130:[function(require,module,exports) {
+},{"./_is-object":94,"./_global":86}],134:[function(require,module,exports) {
 module.exports = !require('./_descriptors') && !require('./_fails')(function () {
   return Object.defineProperty(require('./_dom-create')('div'), 'a', { get: function () { return 7; } }).a != 7;
 });
 
-},{"./_descriptors":100,"./_fails":118,"./_dom-create":117}],131:[function(require,module,exports) {
+},{"./_descriptors":119,"./_fails":136,"./_dom-create":128}],135:[function(require,module,exports) {
 // 7.1.1 ToPrimitive(input [, PreferredType])
 var isObject = require('./_is-object');
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
@@ -12387,7 +13031,7 @@ module.exports = function (it, S) {
   throw TypeError("Can't convert object to primitive value");
 };
 
-},{"./_is-object":77}],98:[function(require,module,exports) {
+},{"./_is-object":94}],117:[function(require,module,exports) {
 var anObject = require('./_an-object');
 var IE8_DOM_DEFINE = require('./_ie8-dom-define');
 var toPrimitive = require('./_to-primitive');
@@ -12405,7 +13049,7 @@ exports.f = require('./_descriptors') ? Object.defineProperty : function defineP
   return O;
 };
 
-},{"./_an-object":106,"./_ie8-dom-define":130,"./_to-primitive":131,"./_descriptors":100}],99:[function(require,module,exports) {
+},{"./_an-object":123,"./_ie8-dom-define":134,"./_to-primitive":135,"./_descriptors":119}],118:[function(require,module,exports) {
 module.exports = function (bitmap, value) {
   return {
     enumerable: !(bitmap & 1),
@@ -12415,7 +13059,7 @@ module.exports = function (bitmap, value) {
   };
 };
 
-},{}],58:[function(require,module,exports) {
+},{}],87:[function(require,module,exports) {
 var dP = require('./_object-dp');
 var createDesc = require('./_property-desc');
 module.exports = require('./_descriptors') ? function (object, key, value) {
@@ -12425,13 +13069,13 @@ module.exports = require('./_descriptors') ? function (object, key, value) {
   return object;
 };
 
-},{"./_object-dp":98,"./_property-desc":99,"./_descriptors":100}],101:[function(require,module,exports) {
+},{"./_object-dp":117,"./_property-desc":118,"./_descriptors":119}],129:[function(require,module,exports) {
 var hasOwnProperty = {}.hasOwnProperty;
 module.exports = function (it, key) {
   return hasOwnProperty.call(it, key);
 };
 
-},{}],69:[function(require,module,exports) {
+},{}],93:[function(require,module,exports) {
 
 var global = require('./_global');
 var core = require('./_core');
@@ -12496,20 +13140,20 @@ $export.U = 64;  // safe
 $export.R = 128; // real proto method for `library`
 module.exports = $export;
 
-},{"./_global":57,"./_core":55,"./_ctx":75,"./_hide":58,"./_has":101}],107:[function(require,module,exports) {
+},{"./_global":86,"./_core":76,"./_ctx":91,"./_hide":87,"./_has":129}],111:[function(require,module,exports) {
 module.exports = require('./_hide');
 
-},{"./_hide":58}],59:[function(require,module,exports) {
+},{"./_hide":87}],88:[function(require,module,exports) {
 module.exports = {};
 
-},{}],110:[function(require,module,exports) {
+},{}],120:[function(require,module,exports) {
 var toString = {}.toString;
 
 module.exports = function (it) {
   return toString.call(it).slice(8, -1);
 };
 
-},{}],119:[function(require,module,exports) {
+},{}],133:[function(require,module,exports) {
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
 var cof = require('./_cof');
 // eslint-disable-next-line no-prototype-builtins
@@ -12517,7 +13161,7 @@ module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
   return cof(it) == 'String' ? it.split('') : Object(it);
 };
 
-},{"./_cof":110}],91:[function(require,module,exports) {
+},{"./_cof":120}],116:[function(require,module,exports) {
 // to indexed object, toObject with fallback for non-array-like ES3 strings
 var IObject = require('./_iobject');
 var defined = require('./_defined');
@@ -12525,7 +13169,7 @@ module.exports = function (it) {
   return IObject(defined(it));
 };
 
-},{"./_iobject":119,"./_defined":103}],113:[function(require,module,exports) {
+},{"./_iobject":133,"./_defined":110}],124:[function(require,module,exports) {
 // 7.1.15 ToLength
 var toInteger = require('./_to-integer');
 var min = Math.min;
@@ -12533,7 +13177,7 @@ module.exports = function (it) {
   return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 };
 
-},{"./_to-integer":102}],141:[function(require,module,exports) {
+},{"./_to-integer":109}],144:[function(require,module,exports) {
 var toInteger = require('./_to-integer');
 var max = Math.max;
 var min = Math.min;
@@ -12542,7 +13186,7 @@ module.exports = function (index, length) {
   return index < 0 ? max(index + length, 0) : min(index, length);
 };
 
-},{"./_to-integer":102}],140:[function(require,module,exports) {
+},{"./_to-integer":109}],143:[function(require,module,exports) {
 // false -> Array#indexOf
 // true  -> Array#includes
 var toIObject = require('./_to-iobject');
@@ -12567,30 +13211,36 @@ module.exports = function (IS_INCLUDES) {
   };
 };
 
-},{"./_to-iobject":91,"./_to-length":113,"./_to-absolute-index":141}],96:[function(require,module,exports) {
+},{"./_to-iobject":116,"./_to-length":124,"./_to-absolute-index":144}],139:[function(require,module,exports) {
 
+var core = require('./_core');
 var global = require('./_global');
 var SHARED = '__core-js_shared__';
 var store = global[SHARED] || (global[SHARED] = {});
-module.exports = function (key) {
-  return store[key] || (store[key] = {});
-};
 
-},{"./_global":57}],97:[function(require,module,exports) {
+(module.exports = function (key, value) {
+  return store[key] || (store[key] = value !== undefined ? value : {});
+})('versions', []).push({
+  version: core.version,
+  mode: require('./_library') ? 'pure' : 'global',
+  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
+});
+
+},{"./_core":76,"./_global":86,"./_library":90}],140:[function(require,module,exports) {
 var id = 0;
 var px = Math.random();
 module.exports = function (key) {
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
 };
 
-},{}],122:[function(require,module,exports) {
+},{}],132:[function(require,module,exports) {
 var shared = require('./_shared')('keys');
 var uid = require('./_uid');
 module.exports = function (key) {
   return shared[key] || (shared[key] = uid(key));
 };
 
-},{"./_shared":96,"./_uid":97}],139:[function(require,module,exports) {
+},{"./_shared":139,"./_uid":140}],142:[function(require,module,exports) {
 var has = require('./_has');
 var toIObject = require('./_to-iobject');
 var arrayIndexOf = require('./_array-includes')(false);
@@ -12609,13 +13259,13 @@ module.exports = function (object, names) {
   return result;
 };
 
-},{"./_has":101,"./_to-iobject":91,"./_array-includes":140,"./_shared-key":122}],136:[function(require,module,exports) {
+},{"./_has":129,"./_to-iobject":116,"./_array-includes":143,"./_shared-key":132}],138:[function(require,module,exports) {
 // IE 8- don't enum bug keys
 module.exports = (
   'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
 ).split(',');
 
-},{}],138:[function(require,module,exports) {
+},{}],141:[function(require,module,exports) {
 // 19.1.2.14 / 15.2.3.14 Object.keys(O)
 var $keys = require('./_object-keys-internal');
 var enumBugKeys = require('./_enum-bug-keys');
@@ -12624,7 +13274,7 @@ module.exports = Object.keys || function keys(O) {
   return $keys(O, enumBugKeys);
 };
 
-},{"./_object-keys-internal":139,"./_enum-bug-keys":136}],135:[function(require,module,exports) {
+},{"./_object-keys-internal":142,"./_enum-bug-keys":138}],137:[function(require,module,exports) {
 var dP = require('./_object-dp');
 var anObject = require('./_an-object');
 var getKeys = require('./_object-keys');
@@ -12639,11 +13289,11 @@ module.exports = require('./_descriptors') ? Object.defineProperties : function 
   return O;
 };
 
-},{"./_object-dp":98,"./_an-object":106,"./_object-keys":138,"./_descriptors":100}],116:[function(require,module,exports) {
+},{"./_object-dp":117,"./_an-object":123,"./_object-keys":141,"./_descriptors":119}],127:[function(require,module,exports) {
 var document = require('./_global').document;
 module.exports = document && document.documentElement;
 
-},{"./_global":57}],120:[function(require,module,exports) {
+},{"./_global":86}],130:[function(require,module,exports) {
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
 var anObject = require('./_an-object');
 var dPs = require('./_object-dps');
@@ -12686,7 +13336,7 @@ module.exports = Object.create || function create(O, Properties) {
   return Properties === undefined ? result : dPs(result, Properties);
 };
 
-},{"./_an-object":106,"./_object-dps":135,"./_enum-bug-keys":136,"./_shared-key":122,"./_dom-create":117,"./_html":116}],60:[function(require,module,exports) {
+},{"./_an-object":123,"./_object-dps":137,"./_enum-bug-keys":138,"./_shared-key":132,"./_dom-create":128,"./_html":127}],89:[function(require,module,exports) {
 var store = require('./_shared')('wks');
 var uid = require('./_uid');
 var Symbol = require('./_global').Symbol;
@@ -12699,7 +13349,7 @@ var $exports = module.exports = function (name) {
 
 $exports.store = store;
 
-},{"./_shared":96,"./_uid":97,"./_global":57}],86:[function(require,module,exports) {
+},{"./_shared":139,"./_uid":140,"./_global":86}],106:[function(require,module,exports) {
 var def = require('./_object-dp').f;
 var has = require('./_has');
 var TAG = require('./_wks')('toStringTag');
@@ -12708,7 +13358,7 @@ module.exports = function (it, tag, stat) {
   if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, { configurable: true, value: tag });
 };
 
-},{"./_object-dp":98,"./_has":101,"./_wks":60}],108:[function(require,module,exports) {
+},{"./_object-dp":117,"./_has":129,"./_wks":89}],112:[function(require,module,exports) {
 'use strict';
 var create = require('./_object-create');
 var descriptor = require('./_property-desc');
@@ -12723,14 +13373,14 @@ module.exports = function (Constructor, NAME, next) {
   setToStringTag(Constructor, NAME + ' Iterator');
 };
 
-},{"./_object-create":120,"./_property-desc":99,"./_set-to-string-tag":86,"./_hide":58,"./_wks":60}],121:[function(require,module,exports) {
+},{"./_object-create":130,"./_property-desc":118,"./_set-to-string-tag":106,"./_hide":87,"./_wks":89}],131:[function(require,module,exports) {
 // 7.1.13 ToObject(argument)
 var defined = require('./_defined');
 module.exports = function (it) {
   return Object(defined(it));
 };
 
-},{"./_defined":103}],109:[function(require,module,exports) {
+},{"./_defined":110}],113:[function(require,module,exports) {
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
 var has = require('./_has');
 var toObject = require('./_to-object');
@@ -12745,7 +13395,7 @@ module.exports = Object.getPrototypeOf || function (O) {
   } return O instanceof Object ? ObjectProto : null;
 };
 
-},{"./_has":101,"./_to-object":121,"./_shared-key":122}],73:[function(require,module,exports) {
+},{"./_has":129,"./_to-object":131,"./_shared-key":132}],84:[function(require,module,exports) {
 'use strict';
 var LIBRARY = require('./_library');
 var $export = require('./_export');
@@ -12816,7 +13466,7 @@ module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE
   return methods;
 };
 
-},{"./_library":74,"./_export":69,"./_redefine":107,"./_hide":58,"./_iterators":59,"./_iter-create":108,"./_set-to-string-tag":86,"./_object-gpo":109,"./_wks":60}],50:[function(require,module,exports) {
+},{"./_library":90,"./_export":93,"./_redefine":111,"./_hide":87,"./_iterators":88,"./_iter-create":112,"./_set-to-string-tag":106,"./_object-gpo":113,"./_wks":89}],71:[function(require,module,exports) {
 'use strict';
 var $at = require('./_string-at')(true);
 
@@ -12835,15 +13485,15 @@ require('./_iter-define')(String, 'String', function (iterated) {
   return { value: point, done: false };
 });
 
-},{"./_string-at":71,"./_iter-define":73}],89:[function(require,module,exports) {
+},{"./_string-at":83,"./_iter-define":84}],114:[function(require,module,exports) {
 module.exports = function () { /* empty */ };
 
-},{}],90:[function(require,module,exports) {
+},{}],115:[function(require,module,exports) {
 module.exports = function (done, value) {
   return { value: value, done: !!done };
 };
 
-},{}],56:[function(require,module,exports) {
+},{}],85:[function(require,module,exports) {
 'use strict';
 var addToUnscopables = require('./_add-to-unscopables');
 var step = require('./_iter-step');
@@ -12879,7 +13529,7 @@ addToUnscopables('keys');
 addToUnscopables('values');
 addToUnscopables('entries');
 
-},{"./_add-to-unscopables":89,"./_iter-step":90,"./_iterators":59,"./_to-iobject":91,"./_iter-define":73}],51:[function(require,module,exports) {
+},{"./_add-to-unscopables":114,"./_iter-step":115,"./_iterators":88,"./_to-iobject":116,"./_iter-define":84}],72:[function(require,module,exports) {
 
 require('./es6.array.iterator');
 var global = require('./_global');
@@ -12901,7 +13551,7 @@ for (var i = 0; i < DOMIterables.length; i++) {
   Iterators[NAME] = Iterators.Array;
 }
 
-},{"./es6.array.iterator":56,"./_global":57,"./_hide":58,"./_iterators":59,"./_wks":60}],76:[function(require,module,exports) {
+},{"./es6.array.iterator":85,"./_global":86,"./_hide":87,"./_iterators":88,"./_wks":89}],92:[function(require,module,exports) {
 // getting tag from 19.1.3.6 Object.prototype.toString()
 var cof = require('./_cof');
 var TAG = require('./_wks')('toStringTag');
@@ -12926,14 +13576,14 @@ module.exports = function (it) {
     : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
 };
 
-},{"./_cof":110,"./_wks":60}],79:[function(require,module,exports) {
+},{"./_cof":120,"./_wks":89}],96:[function(require,module,exports) {
 module.exports = function (it, Constructor, name, forbiddenField) {
   if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
     throw TypeError(name + ': incorrect invocation!');
   } return it;
 };
 
-},{}],111:[function(require,module,exports) {
+},{}],121:[function(require,module,exports) {
 // call something on iterator step with safe closing on error
 var anObject = require('./_an-object');
 module.exports = function (iterator, fn, value, entries) {
@@ -12947,7 +13597,7 @@ module.exports = function (iterator, fn, value, entries) {
   }
 };
 
-},{"./_an-object":106}],112:[function(require,module,exports) {
+},{"./_an-object":123}],122:[function(require,module,exports) {
 // check on default Array iterator
 var Iterators = require('./_iterators');
 var ITERATOR = require('./_wks')('iterator');
@@ -12957,7 +13607,7 @@ module.exports = function (it) {
   return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
 };
 
-},{"./_iterators":59,"./_wks":60}],114:[function(require,module,exports) {
+},{"./_iterators":88,"./_wks":89}],125:[function(require,module,exports) {
 var classof = require('./_classof');
 var ITERATOR = require('./_wks')('iterator');
 var Iterators = require('./_iterators');
@@ -12967,7 +13617,7 @@ module.exports = require('./_core').getIteratorMethod = function (it) {
     || Iterators[classof(it)];
 };
 
-},{"./_classof":76,"./_wks":60,"./_iterators":59,"./_core":55}],80:[function(require,module,exports) {
+},{"./_classof":92,"./_wks":89,"./_iterators":88,"./_core":76}],97:[function(require,module,exports) {
 var ctx = require('./_ctx');
 var call = require('./_iter-call');
 var isArrayIter = require('./_is-array-iter');
@@ -12994,7 +13644,7 @@ var exports = module.exports = function (iterable, entries, fn, that, ITERATOR) 
 exports.BREAK = BREAK;
 exports.RETURN = RETURN;
 
-},{"./_ctx":75,"./_iter-call":111,"./_is-array-iter":112,"./_an-object":106,"./_to-length":113,"./core.get-iterator-method":114}],70:[function(require,module,exports) {
+},{"./_ctx":91,"./_iter-call":121,"./_is-array-iter":122,"./_an-object":123,"./_to-length":124,"./core.get-iterator-method":125}],98:[function(require,module,exports) {
 // 7.3.20 SpeciesConstructor(O, defaultConstructor)
 var anObject = require('./_an-object');
 var aFunction = require('./_a-function');
@@ -13005,7 +13655,7 @@ module.exports = function (O, D) {
   return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? D : aFunction(S);
 };
 
-},{"./_an-object":106,"./_a-function":78,"./_wks":60}],115:[function(require,module,exports) {
+},{"./_an-object":123,"./_a-function":95,"./_wks":89}],126:[function(require,module,exports) {
 // fast apply, http://jsperf.lnkit.com/fast-apply/5
 module.exports = function (fn, args, that) {
   var un = that === undefined;
@@ -13023,7 +13673,7 @@ module.exports = function (fn, args, that) {
   } return fn.apply(that, args);
 };
 
-},{}],81:[function(require,module,exports) {
+},{}],99:[function(require,module,exports) {
 
 
 var ctx = require('./_ctx');
@@ -13111,7 +13761,7 @@ module.exports = {
   clear: clearTask
 };
 
-},{"./_ctx":75,"./_invoke":115,"./_html":116,"./_dom-create":117,"./_global":57,"./_cof":110}],82:[function(require,module,exports) {
+},{"./_ctx":91,"./_invoke":126,"./_html":127,"./_dom-create":128,"./_global":86,"./_cof":120}],100:[function(require,module,exports) {
 
 
 var global = require('./_global');
@@ -13156,7 +13806,8 @@ module.exports = function () {
     };
   // environments with maybe non-completely correct, but existent Promise
   } else if (Promise && Promise.resolve) {
-    var promise = Promise.resolve();
+    // Promise.resolve without an argument throws an error in LG WebOS 2
+    var promise = Promise.resolve(undefined);
     notify = function () {
       promise.then(flush);
     };
@@ -13183,7 +13834,7 @@ module.exports = function () {
   };
 };
 
-},{"./_global":57,"./_task":81,"./_cof":110}],83:[function(require,module,exports) {
+},{"./_global":86,"./_task":99,"./_cof":120}],101:[function(require,module,exports) {
 'use strict';
 // 25.4.1.5 NewPromiseCapability(C)
 var aFunction = require('./_a-function');
@@ -13203,7 +13854,7 @@ module.exports.f = function (C) {
   return new PromiseCapability(C);
 };
 
-},{"./_a-function":78}],84:[function(require,module,exports) {
+},{"./_a-function":95}],102:[function(require,module,exports) {
 module.exports = function (exec) {
   try {
     return { e: false, v: exec() };
@@ -13212,7 +13863,14 @@ module.exports = function (exec) {
   }
 };
 
-},{}],72:[function(require,module,exports) {
+},{}],103:[function(require,module,exports) {
+
+var global = require('./_global');
+var navigator = global.navigator;
+
+module.exports = navigator && navigator.userAgent || '';
+
+},{"./_global":86}],104:[function(require,module,exports) {
 var anObject = require('./_an-object');
 var isObject = require('./_is-object');
 var newPromiseCapability = require('./_new-promise-capability');
@@ -13226,7 +13884,7 @@ module.exports = function (C, x) {
   return promiseCapability.promise;
 };
 
-},{"./_an-object":106,"./_is-object":77,"./_new-promise-capability":83}],85:[function(require,module,exports) {
+},{"./_an-object":123,"./_is-object":94,"./_new-promise-capability":101}],105:[function(require,module,exports) {
 var hide = require('./_hide');
 module.exports = function (target, src, safe) {
   for (var key in src) {
@@ -13235,7 +13893,7 @@ module.exports = function (target, src, safe) {
   } return target;
 };
 
-},{"./_hide":58}],87:[function(require,module,exports) {
+},{"./_hide":87}],107:[function(require,module,exports) {
 
 'use strict';
 var global = require('./_global');
@@ -13252,7 +13910,7 @@ module.exports = function (KEY) {
   });
 };
 
-},{"./_global":57,"./_core":55,"./_object-dp":98,"./_descriptors":100,"./_wks":60}],88:[function(require,module,exports) {
+},{"./_global":86,"./_core":76,"./_object-dp":117,"./_descriptors":119,"./_wks":89}],108:[function(require,module,exports) {
 var ITERATOR = require('./_wks')('iterator');
 var SAFE_CLOSING = false;
 
@@ -13276,7 +13934,7 @@ module.exports = function (exec, skipClosing) {
   return safe;
 };
 
-},{"./_wks":60}],52:[function(require,module,exports) {
+},{"./_wks":89}],73:[function(require,module,exports) {
 
 
 'use strict';
@@ -13294,10 +13952,13 @@ var task = require('./_task').set;
 var microtask = require('./_microtask')();
 var newPromiseCapabilityModule = require('./_new-promise-capability');
 var perform = require('./_perform');
+var userAgent = require('./_user-agent');
 var promiseResolve = require('./_promise-resolve');
 var PROMISE = 'Promise';
 var TypeError = global.TypeError;
 var process = global.process;
+var versions = process && process.versions;
+var v8 = versions && versions.v8 || '';
 var $Promise = global[PROMISE];
 var isNode = classof(process) == 'process';
 var empty = function () { /* empty */ };
@@ -13312,7 +13973,13 @@ var USE_NATIVE = !!function () {
       exec(empty, empty);
     };
     // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-    return (isNode || typeof PromiseRejectionEvent == 'function') && promise.then(empty) instanceof FakePromise;
+    return (isNode || typeof PromiseRejectionEvent == 'function')
+      && promise.then(empty) instanceof FakePromise
+      // v8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
+      // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
+      // we can't detect it synchronously, so just check versions
+      && v8.indexOf('6.6') !== 0
+      && userAgent.indexOf('Chrome/66') === -1;
   } catch (e) { /* empty */ }
 }();
 
@@ -13557,7 +14224,7 @@ $export($export.S + $export.F * !(USE_NATIVE && require('./_iter-detect')(functi
   }
 });
 
-},{"./_library":74,"./_global":57,"./_ctx":75,"./_classof":76,"./_export":69,"./_is-object":77,"./_a-function":78,"./_an-instance":79,"./_for-of":80,"./_species-constructor":70,"./_task":81,"./_microtask":82,"./_new-promise-capability":83,"./_perform":84,"./_promise-resolve":72,"./_wks":60,"./_redefine-all":85,"./_set-to-string-tag":86,"./_set-species":87,"./_core":55,"./_iter-detect":88}],53:[function(require,module,exports) {
+},{"./_library":90,"./_global":86,"./_ctx":91,"./_classof":92,"./_export":93,"./_is-object":94,"./_a-function":95,"./_an-instance":96,"./_for-of":97,"./_species-constructor":98,"./_task":99,"./_microtask":100,"./_new-promise-capability":101,"./_perform":102,"./_user-agent":103,"./_promise-resolve":104,"./_wks":89,"./_redefine-all":105,"./_set-to-string-tag":106,"./_set-species":107,"./_core":76,"./_iter-detect":108}],74:[function(require,module,exports) {
 
 // https://github.com/tc39/proposal-promise-finally
 'use strict';
@@ -13580,7 +14247,7 @@ $export($export.P + $export.R, 'Promise', { 'finally': function (onFinally) {
   );
 } });
 
-},{"./_export":69,"./_core":55,"./_global":57,"./_species-constructor":70,"./_promise-resolve":72}],54:[function(require,module,exports) {
+},{"./_export":93,"./_core":76,"./_global":86,"./_species-constructor":98,"./_promise-resolve":104}],75:[function(require,module,exports) {
 'use strict';
 // https://github.com/tc39/proposal-promise-try
 var $export = require('./_export');
@@ -13594,7 +14261,7 @@ $export($export.S, 'Promise', { 'try': function (callbackfn) {
   return promiseCapability.promise;
 } });
 
-},{"./_export":69,"./_new-promise-capability":83,"./_perform":84}],47:[function(require,module,exports) {
+},{"./_export":93,"./_new-promise-capability":101,"./_perform":102}],61:[function(require,module,exports) {
 require('../modules/es6.object.to-string');
 require('../modules/es6.string.iterator');
 require('../modules/web.dom.iterable');
@@ -13603,9 +14270,9 @@ require('../modules/es7.promise.finally');
 require('../modules/es7.promise.try');
 module.exports = require('../modules/_core').Promise;
 
-},{"../modules/es6.object.to-string":49,"../modules/es6.string.iterator":50,"../modules/web.dom.iterable":51,"../modules/es6.promise":52,"../modules/es7.promise.finally":53,"../modules/es7.promise.try":54,"../modules/_core":55}],46:[function(require,module,exports) {
+},{"../modules/es6.object.to-string":70,"../modules/es6.string.iterator":71,"../modules/web.dom.iterable":72,"../modules/es6.promise":73,"../modules/es7.promise.finally":74,"../modules/es7.promise.try":75,"../modules/_core":76}],59:[function(require,module,exports) {
 module.exports = { "default": require("core-js/library/fn/promise"), __esModule: true };
-},{"core-js/library/fn/promise":47}],40:[function(require,module,exports) {
+},{"core-js/library/fn/promise":61}],55:[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -13705,282 +14372,458 @@ function fetchJsonp(url) {
 }
 
 exports.default = fetchJsonp;
-},{"babel-runtime/core-js/promise":46}],41:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".control-pane[data-v-f6f3c440]{\n  display: flex;\n  padding: 10px;\n  align-items: center;\n}\n.song-name[data-v-f6f3c440]{\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.music-detail[data-v-f6f3c440]{\n  margin-left: 10px;\n  overflow: hidden;\n}\n.music-detail p[data-v-f6f3c440]{\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  overflow: hidden;\n}\ni.iconfont[data-v-f6f3c440]{\n  font-size: 60px;\n}\naduio[data-v-f6f3c440]{\n  display: none;\n}");(function () {
-  "use strict";
+},{"babel-runtime/core-js/promise":59}],56:[function(require,module,exports) {
+"use strict";
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = {
-    name: "MusicPlayer",
-    props: {
-      music: Object
-    },
-    data: function data() {
-      return {
-        play: false
-      };
-    },
-    beforeUpdate: function beforeUpdate() {},
-    methods: {
-      generateSingerName: function generateSingerName() {
-        var singers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
-        var names = [];
-        singers.forEach(function (s) {
-          names.push(s.name);
-        });
-        return names.join("/");
-      },
-      setMusicPlay: function setMusicPlay(play) {
-        this.play = play;
-        play ? this.$refs.player.play() : this.$refs.player.pause();
-      }
-    }
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
-}
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "player-block" }, [_c('div', { staticClass: "control-pane" }, [_c('div', { staticClass: "player-button" }, [_c('i', { staticClass: "iconfont icon", class: { 'icon-pause-o': _vm.play, 'icon-17': !_vm.play }, on: { "click": function click($event) {
-        _vm.setMusicPlay(!_vm.play);
-      } } })]), _vm._v(" "), _c('div', { staticClass: "music-detail" }, [_c('p', { staticClass: "song-name" }, [_vm._v(_vm._s(_vm.music.songname))]), _vm._v(" "), _c('p', { staticClass: "singer-name" }, [_vm._v(_vm._s(_vm.generateSingerName(_vm.music.singers)))])])]), _vm._v(" "), _c('audio', { ref: "player", staticClass: "palyer", attrs: { "src": _vm.music && _vm.music.url, "autoplay": "" }, on: { "ended": function ended($event) {
-        _vm.setMusicPlay(false);
-      }, "loadedmetadata": function loadedmetadata($event) {
-        _vm.setMusicPlay(true);
-      } } })]);
-};
-__vue__options__.staticRenderFns = [];
-__vue__options__._scopeId = "data-v-f6f3c440";
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-f6f3c440", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-f6f3c440", __vue__options__);
-    }
-  })();
-}
-},{"vueify/lib/insert-css":44,"vue-hot-reload-api":42,"vue":19}],15:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".topic-detail[data-v-5d8e4af8]{\n  display: flex;\n  padding: 50px 15px  20px;\n  height: 125px;\n  align-items: center;\n}\n.topic-cover[data-v-5d8e4af8]{\n  height: 125px;\n  width: 125px;\n  overflow: hidden;\n  margin-right: 15px;\n}\n.topic-cover img[data-v-5d8e4af8]{\n  height: 125px;\n  width: 125px;\n}\n.topic-info[data-v-5d8e4af8]{\n  font-size: 12px;\n  color: #fdfdfd;\n  overflow: hidden;\n  flex: 1;\n}\n.topic-info .topic-name[data-v-5d8e4af8]{\n  font-size: 16px;\n  margin-bottom: 5px;\n  text-overflow: ellipsis;\n  white-space:nowrap;\n  overflow: hidden;\n}\n.topic-detail-wrapper[data-v-5d8e4af8]{\n  position: relative;\n  background: rgba(94, 116,160, 0.5);\n}\n.background-img[data-v-5d8e4af8]{\n  position: absolute;\n  z-index: -1;\n  height: calc(100% - 10px);\n  width: 100%;\n  filter: blur(10px);\n}\n.song-list[data-v-5d8e4af8]{\n  counter-reset: songCounter 0;\n  padding: 0 10px;\n}\n.song-list li[data-v-5d8e4af8]{\n  border-top: 1px solid #99a1b4;\n  position: relative;\n  padding: 10px 10px 10px 35px;\n  color: #4c5475;\n  overflow: hidden;\n}\n.song-name[data-v-5d8e4af8]{\n  font-size: 16px;\n  margin-bottom: 5px;\n}\n.song-list li[data-v-5d8e4af8]:before{\n  position: absolute;\n  font-size: 16px;\n  left: 8px;\n  top: 19px;\n  content: counter(songCounter);\n  counter-increment: songCounter;\n}\n.topic-list[data-v-5d8e4af8]{\n  background: #fdfdfd;\n}\n.total-num[data-v-5d8e4af8]{\n  font-size: 14px;\n  color: #4c5475;\n  padding: 10px;\n  margin-bottom: 5px;\n}\n.song-name[data-v-5d8e4af8], .song-singer[data-v-5d8e4af8]{\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}");(function () {
-  "use strict";
+exports.default = {
+  name: "MusicPlayer",
+  props: {
+    music: Object
+  },
+  data: function data() {
+    return {
+      play: false
+    };
+  },
+  beforeUpdate: function beforeUpdate() {},
+  methods: {
+    generateSingerName: function generateSingerName() {
+      var singers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _fetch_jsonp = require("../utils/fetch_jsonp.js");
-
-  var _fetch_jsonp2 = _interopRequireDefault(_fetch_jsonp);
-
-  var _music_player = require("./music_player.vue");
-
-  var _music_player2 = _interopRequireDefault(_music_player);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
-  }
-
-  var topic_url = "https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?g_tk=5381&uin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&tpl=3&page=detail&type=top&_=1492910996732";
-  exports.default = {
-    name: "Topiclist",
-    data: function data() {
-      return {
-        music: {},
-        detail: {}
-      };
-    },
-    components: {
-      MusicPlayer: _music_player2.default
-    },
-    created: function created() {
-      var _this = this;
-
-      (0, _fetch_jsonp2.default)(topic_url + "&topid=" + this.$route.params.id, {
-        callback: "jsonpCallback"
-      }).then(function (response) {
-        return response.json();
-      }).then(function (data) {
-        _this.detail = data;
-      }).catch(function (error) {
-        console.log(error);
+      var names = [];
+      singers.forEach(function (s) {
+        names.push(s.name);
       });
+      return names.join("/");
     },
-    methods: {
-      getSinerNames: function getSinerNames(singers) {
-        var names = [];
-        singers.forEach(function (s) {
-          names.push(s.name);
-        });
-        return names.join("/");
-      },
-      setMusicUrl: function setMusicUrl(mid, songname, singers) {
-        this.music = {
-          url: "http://dl.stream.qqmusic.qq.com/C400" + mid + ".m4a?guid=7931438544&vkey=72A8E5B5A52D4BD8EB8063ACA85F9E673970EF727E4861BF911AE68A4926CF56B64C62F65F29AD2476665E6C0F67D5B20A6EBDB3881A0162&uin=0&fromtag=38",
-          songname: songname,
-          singers: singers
-        };
-      }
+    setMusicPlay: function setMusicPlay(play) {
+      this.play = play;
+      play ? this.$refs.player.play() : this.$refs.player.pause();
     }
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
-}
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "topiclist-container" }, [_c('div', { staticClass: "topic-detail-wrapper" }, [_c('img', { staticClass: "background-img", attrs: { "src": _vm.detail.topinfo && _vm.detail.topinfo.pic } }), _vm._v(" "), _c('div', { staticClass: "topic-detail" }, [_c('div', { staticClass: "topic-cover" }, [_c('img', { attrs: { "src": _vm.detail.topinfo && _vm.detail.topinfo.pic } })]), _vm._v(" "), _c('div', { staticClass: "topic-info" }, [_c('p', { staticClass: "topic-name", attrs: { "title": _vm.detail.topinfo && _vm.detail.topinfo.ListName } }, [_vm._v(_vm._s(_vm.detail.topinfo && _vm.detail.topinfo.ListName))]), _vm._v(" "), _c('p', { staticClass: "date" }, [_vm._v("创建时间：" + _vm._s(_vm.detail.date))]), _vm._v(" "), _c('p', { staticClass: "date" }, [_vm._v("更新时间：" + _vm._s(_vm.detail.update_time))])])]), _vm._v(" "), _c('MusicPlayer', { attrs: { "music": _vm.music } })], 1), _vm._v(" "), _c('div', { staticClass: "topic-list" }, [_c('p', { staticClass: "total-num" }, [_vm._v("共" + _vm._s(_vm.detail.cur_song_num) + "首")]), _vm._v(" "), _c('ul', { staticClass: "song-list" }, _vm._l(_vm.detail.songlist, function (s) {
-    return _c('li', { on: { "click": function click($event) {
-          _vm.setMusicUrl(s.data && s.data.strMediaMid, s.data && s.data.songname, s.data && s.data.singer);
-        } } }, [_c('p', { staticClass: "song-name", attrs: { "title": s.data && s.data.songname } }, [_vm._v(_vm._s(s.data && s.data.songname))]), _vm._v(" "), _c('p', { staticClass: "song-singer" }, [_vm._v(_vm._s(_vm.getSinerNames(s.data.singer)))])]);
-  }))])]);
+  }
 };
-__vue__options__.staticRenderFns = [];
-__vue__options__._scopeId = "data-v-5d8e4af8";
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-5d8e4af8", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-5d8e4af8", __vue__options__);
-    }
-  })();
-}
-},{"vueify/lib/insert-css":44,"../utils/fetch_jsonp.js":40,"./music_player.vue":41,"vue-hot-reload-api":42,"vue":19}],17:[function(require,module,exports) {
-var __vueify_style_dispose__ = require("vueify/lib/insert-css").insert(".fade-enter-active, .fade-leave-active {\n  transition: opacity .5s;\n}\n.fade-enter, .fade-leave-to {\n  opacity: 0;\n}");(function () {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _tabs = require("./tabs.vue");
-
-  var _tabs2 = _interopRequireDefault(_tabs);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
-  }
-
-  exports.default = {
-    name: "HomeContainer",
-    components: {
-      Tabs: _tabs2.default
-    }
-  };
-})();
-if (module.exports.__esModule) module.exports = module.exports.default;
-var __vue__options__ = typeof module.exports === "function" ? module.exports.options : module.exports;
-if (__vue__options__.functional) {
-  console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.");
-}
-__vue__options__.render = function render() {
-  var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "home-container" }, [_c('Tabs'), _vm._v(" "), _c('transition', { attrs: { "name": "fade", "mode": "out-in" } }, [_c('router-view', { staticClass: "view" })], 1)], 1);
-};
-__vue__options__.staticRenderFns = [];
-if (module.hot) {
-  (function () {
-    var hotAPI = require("vue-hot-reload-api");
-    hotAPI.install(require("vue"), true);
-    if (!hotAPI.compatible) return;
-    module.hot.accept();
-    module.hot.dispose(__vueify_style_dispose__);
-    if (!module.hot.data) {
-      hotAPI.createRecord("data-v-6e2752f4", __vue__options__);
-    } else {
-      hotAPI.rerender("data-v-6e2752f4", __vue__options__);
-    }
-  })();
-}
-},{"vueify/lib/insert-css":44,"./tabs.vue":38,"vue-hot-reload-api":42,"vue":19}],45:[function(require,module,exports) {
-var bundleURL = null;
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
-
-  return bundleURL;
-}
-
-function getBundleURL() {
-  // Attempt to find the URL of the current script and use that as the base URL
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g);
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
-  }
-
-  return '/';
-}
-
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
-}
-
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-},{}],29:[function(require,module,exports) {
-var bundle = require('./bundle-url');
-
-function updateLink(link) {
-  var newLink = link.cloneNode();
-  newLink.onload = function () {
-    link.remove();
-  };
-  newLink.href = link.href.split('?')[0] + '?' + Date.now();
-  link.parentNode.insertBefore(newLink, link.nextSibling);
-}
-
-var cssTimeout = null;
-function reloadCSS() {
-  if (cssTimeout) {
-    return;
-  }
-
-  cssTimeout = setTimeout(function () {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
-    for (var i = 0; i < links.length; i++) {
-      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
-        updateLink(links[i]);
+      var $1e008b = exports.default || module.exports;
+      if (typeof $1e008b === 'function') {
+        $1e008b = $1e008b.options;
       }
-    }
-
-    cssTimeout = null;
-  }, 50);
+    
+        /* template */
+        Object.assign($1e008b, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "player-block" }, [
+    _c("div", { staticClass: "control-pane" }, [
+      _c("div", { staticClass: "player-button" }, [
+        _c("i", {
+          staticClass: "iconfont icon",
+          class: { "icon-pause-o": _vm.play, "icon-17": !_vm.play },
+          on: {
+            click: function($event) {
+              _vm.setMusicPlay(!_vm.play)
+            }
+          }
+        })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "music-detail" }, [
+        _c("p", { staticClass: "song-name" }, [
+          _vm._v(_vm._s(_vm.music.songname))
+        ]),
+        _vm._v(" "),
+        _c("p", { staticClass: "singer-name" }, [
+          _vm._v(_vm._s(_vm.generateSingerName(_vm.music.singers)))
+        ])
+      ])
+    ]),
+    _vm._v(" "),
+    _c("audio", {
+      ref: "player",
+      staticClass: "palyer",
+      attrs: { src: _vm.music && _vm.music.url, autoplay: "" },
+      on: {
+        ended: function($event) {
+          _vm.setMusicPlay(false)
+        },
+        loadedmetadata: function($event) {
+          _vm.setMusicPlay(true)
+        }
+      }
+    })
+  ])
 }
+var staticRenderFns = []
+render._withStripped = true
 
-module.exports = reloadCSS;
-},{"./bundle-url":45}],3:[function(require,module,exports) {
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-1e008b",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$1e008b', $1e008b);
+          } else {
+            api.reload('$1e008b', $1e008b);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],15:[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _fetch_jsonp = require("../utils/fetch_jsonp.js");
+
+var _fetch_jsonp2 = _interopRequireDefault(_fetch_jsonp);
+
+var _music_player = require("./music_player.vue");
+
+var _music_player2 = _interopRequireDefault(_music_player);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+var topic_url = "https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?g_tk=5381&uin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&tpl=3&page=detail&type=top&_=1492910996732";
+exports.default = {
+  name: "Topiclist",
+  data: function data() {
+    return {
+      music: {},
+      detail: {}
+    };
+  },
+  components: {
+    MusicPlayer: _music_player2.default
+  },
+  created: function created() {
+    var _this = this;
+
+    (0, _fetch_jsonp2.default)(topic_url + "&topid=" + this.$route.params.id, {
+      callback: "jsonpCallback"
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      _this.detail = data;
+    }).catch(function (error) {
+      console.log(error);
+    });
+  },
+  methods: {
+    getSinerNames: function getSinerNames(singers) {
+      var names = [];
+      singers.forEach(function (s) {
+        names.push(s.name);
+      });
+      return names.join("/");
+    },
+    setMusicUrl: function setMusicUrl(mid, songname, singers) {
+      this.music = {
+        url: "http://dl.stream.qqmusic.qq.com/C400" + mid + ".m4a?guid=7931438544&vkey=72A8E5B5A52D4BD8EB8063ACA85F9E673970EF727E4861BF911AE68A4926CF56B64C62F65F29AD2476665E6C0F67D5B20A6EBDB3881A0162&uin=0&fromtag=38",
+        songname: songname,
+        singers: singers
+      };
+    }
+  }
+};
+      var $0b889c = exports.default || module.exports;
+      if (typeof $0b889c === 'function') {
+        $0b889c = $0b889c.options;
+      }
+    
+        /* template */
+        Object.assign($0b889c, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "topiclist-container" }, [
+    _c(
+      "div",
+      { staticClass: "topic-detail-wrapper" },
+      [
+        _c("img", {
+          staticClass: "background-img",
+          attrs: { src: _vm.detail.topinfo && _vm.detail.topinfo.pic }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "topic-detail" }, [
+          _c("div", { staticClass: "topic-cover" }, [
+            _c("img", {
+              attrs: { src: _vm.detail.topinfo && _vm.detail.topinfo.pic }
+            })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "topic-info" }, [
+            _c(
+              "p",
+              {
+                staticClass: "topic-name",
+                attrs: {
+                  title: _vm.detail.topinfo && _vm.detail.topinfo.ListName
+                }
+              },
+              [
+                _vm._v(
+                  _vm._s(_vm.detail.topinfo && _vm.detail.topinfo.ListName)
+                )
+              ]
+            ),
+            _vm._v(" "),
+            _c("p", { staticClass: "date" }, [
+              _vm._v("创建时间：" + _vm._s(_vm.detail.date))
+            ]),
+            _vm._v(" "),
+            _c("p", { staticClass: "date" }, [
+              _vm._v("更新时间：" + _vm._s(_vm.detail.update_time))
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("MusicPlayer", { attrs: { music: _vm.music } })
+      ],
+      1
+    ),
+    _vm._v(" "),
+    _c("div", { staticClass: "topic-list" }, [
+      _c("p", { staticClass: "total-num" }, [
+        _vm._v("共" + _vm._s(_vm.detail.cur_song_num) + "首")
+      ]),
+      _vm._v(" "),
+      _c(
+        "ul",
+        { staticClass: "song-list" },
+        _vm._l(_vm.detail.songlist, function(s) {
+          return _c(
+            "li",
+            {
+              on: {
+                click: function($event) {
+                  _vm.setMusicUrl(
+                    s.data && s.data.strMediaMid,
+                    s.data && s.data.songname,
+                    s.data && s.data.singer
+                  )
+                }
+              }
+            },
+            [
+              _c(
+                "p",
+                {
+                  staticClass: "song-name",
+                  attrs: { title: s.data && s.data.songname }
+                },
+                [_vm._v(_vm._s(s.data && s.data.songname))]
+              ),
+              _vm._v(" "),
+              _c("p", { staticClass: "song-singer" }, [
+                _vm._v(_vm._s(_vm.getSinerNames(s.data.singer)))
+              ])
+            ]
+          )
+        })
+      )
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: "data-v-0b889c",
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$0b889c', $0b889c);
+          } else {
+            api.reload('$0b889c', $0b889c);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"../utils/fetch_jsonp.js":55,"./music_player.vue":56,"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],17:[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _tabs = require("./tabs.vue");
+
+var _tabs2 = _interopRequireDefault(_tabs);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+  name: "HomeContainer",
+  components: {
+    Tabs: _tabs2.default
+  }
+}; //
+//
+//
+//
+//
+//
+//
+//
+      var $766aa5 = exports.default || module.exports;
+      if (typeof $766aa5 === 'function') {
+        $766aa5 = $766aa5.options;
+      }
+    
+        /* template */
+        Object.assign($766aa5, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "home-container" },
+    [
+      _c("Tabs"),
+      _vm._v(" "),
+      _c(
+        "transition",
+        { attrs: { name: "fade", mode: "out-in" } },
+        [_c("router-view", { staticClass: "view" })],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: null,
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$766aa5', $766aa5);
+          } else {
+            api.reload('$766aa5', $766aa5);
+          }
+        }
+
+        
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+      }
+    })();
+},{"./tabs.vue":54,"_css_loader":35,"vue-hot-reload-api":57,"vue":19}],3:[function(require,module,exports) {
 
         var reloadCSS = require('_css_loader');
         module.hot.dispose(reloadCSS);
         module.hot.accept(reloadCSS);
       
-},{"_css_loader":29}],5:[function(require,module,exports) {
+},{"_css_loader":35}],5:[function(require,module,exports) {
 
         var reloadCSS = require('_css_loader');
         module.hot.dispose(reloadCSS);
         module.hot.accept(reloadCSS);
       
-},{"./../fonts/iconfont.eot":[["iconfont.f8d33386.eot",31],31],"./../fonts/iconfont.ttf":[["iconfont.c5edb34e.ttf",33],33],"./../fonts/iconfont.svg":[["iconfont.ddafca24.svg",35],35],"_css_loader":29}],1:[function(require,module,exports) {
+},{"./../fonts/iconfont.eot":[["iconfont.a1a15004.eot",36],36],"./../fonts/iconfont.ttf":[["iconfont.0ddc966d.ttf",37],37],"./../fonts/iconfont.svg":[["iconfont.b7657229.svg",38],38],"_css_loader":35}],1:[function(require,module,exports) {
 'use strict';
 
 var _vue = require('vue');
@@ -14049,59 +14892,100 @@ new _vue2.default({
 
 if ("serviceWorker" in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register("http://127.0.0.1:3000/sw.js", { scope: "/" }).then(function (registration) {}).catch(function (error) {});
+    navigator.serviceWorker.register(window.location.origin + "/sw.js", { scope: "/" }).then(function (registration) {}).catch(function (error) {});
   });
 }
-},{"vue":19,"vue-router":21,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/topiclist.vue":15,"./components/home_container.vue":17,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],0:[function(require,module,exports) {
-var global = (1, eval)('this');
+},{"vue":19,"vue-router":21,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/topiclist.vue":15,"./components/home_container.vue":17,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],156:[function(require,module,exports) {
+var global = arguments[3];
+var OVERLAY_ID = '__parcel__error__overlay__';
+
 var OldModule = module.bundle.Module;
-function Module(config) {
-  OldModule.call(this);
+
+function Module(moduleName) {
+  OldModule.call(this, moduleName);
   this.hot = {
+    data: module.bundle.hotData,
+    _acceptCallbacks: [],
+    _disposeCallbacks: [],
     accept: function (fn) {
-      this._acceptCallback = fn || function () {};
+      this._acceptCallbacks.push(fn || function () {});
     },
     dispose: function (fn) {
-      this._disposeCallback = fn;
-    },
-    data: config && config.hot
+      this._disposeCallbacks.push(fn);
+    }
   };
+
+  module.bundle.hotData = null;
 }
 
 module.bundle.Module = Module;
 
-if (!module.bundle.parent && typeof WebSocket !== 'undefined') {
-  var ws = new WebSocket('ws://localhost:51067/');
-  ws.onmessage = function(event) {
+var parent = module.bundle.parent;
+if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
+  var hostname = '' || location.hostname;
+  var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '35450' + '/');
+  ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
     if (data.type === 'update') {
       data.assets.forEach(function (asset) {
-        hmrApply(global.require, asset);
+        hmrApply(global.parcelRequire, asset);
       });
 
       data.assets.forEach(function (asset) {
         if (!asset.isNew) {
-          hmrAccept(global.require, asset.id);
+          hmrAccept(global.parcelRequire, asset.id);
         }
       });
+      // Clear the console after HMR
+      console.clear();
     }
 
     if (data.type === 'reload') {
       ws.close();
       ws.onclose = function () {
-        window.location.reload();
-      }
+        location.reload();
+      };
     }
 
     if (data.type === 'error-resolved') {
       console.log('[parcel] ✨ Error resolved');
+
+      removeErrorOverlay();
     }
 
     if (data.type === 'error') {
-      console.error('[parcel] 🚨  ' + data.error.message + '\n' + 'data.error.stack');
+      console.error('[parcel] 🚨  ' + data.error.message + '\n' + data.error.stack);
+
+      removeErrorOverlay();
+
+      var overlay = createErrorOverlay(data);
+      document.body.appendChild(overlay);
     }
   };
+}
+
+function removeErrorOverlay() {
+  var overlay = document.getElementById(OVERLAY_ID);
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function createErrorOverlay(data) {
+  var overlay = document.createElement('div');
+  overlay.id = OVERLAY_ID;
+
+  // html encode message and stack trace
+  var message = document.createElement('div');
+  var stackTrace = document.createElement('pre');
+  message.innerText = data.error.message;
+  stackTrace.innerText = data.error.stack;
+
+  overlay.innerHTML = '<div style="background: black; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; opacity: 0.85; font-family: Menlo, Consolas, monospace; z-index: 9999;">' + '<span style="background: red; padding: 2px 4px; border-radius: 2px;">ERROR</span>' + '<span style="top: 2px; margin-left: 5px; position: relative;">🚨</span>' + '<div style="font-size: 18px; font-weight: bold; margin-top: 20px;">' + message.innerHTML + '</div>' + '<pre>' + stackTrace.innerHTML + '</pre>' + '</div>';
+
+  return overlay;
 }
 
 function getParents(bundle, id) {
@@ -14116,7 +15000,7 @@ function getParents(bundle, id) {
   for (k in modules) {
     for (d in modules[k][1]) {
       dep = modules[k][1][d];
-      if (dep === id || (Array.isArray(dep) && dep[dep.length - 1] === id)) {
+      if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) {
         parents.push(+k);
       }
     }
@@ -14155,23 +15039,31 @@ function hmrAccept(bundle, id) {
   }
 
   var cached = bundle.cache[id];
-  if (cached && cached.hot._disposeCallback) {
-    cached.hot._disposeCallback();
+  bundle.hotData = {};
+  if (cached) {
+    cached.hot.data = bundle.hotData;
+  }
+
+  if (cached && cached.hot && cached.hot._disposeCallbacks.length) {
+    cached.hot._disposeCallbacks.forEach(function (cb) {
+      cb(bundle.hotData);
+    });
   }
 
   delete bundle.cache[id];
-  bundle(id, undefined, {
-    hot: true
-  });
+  bundle(id);
 
   cached = bundle.cache[id];
-  if (cached && cached.hot && cached.hot._acceptCallback) {
-    cached.hot._acceptCallback();
+  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
+    cached.hot._acceptCallbacks.forEach(function (cb) {
+      cb();
+    });
     return true;
   }
 
-  return getParents(global.require, id).some(function (id) {
-    return hmrAccept(global.require, id)
+  return getParents(global.parcelRequire, id).some(function (id) {
+    return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},[0,1])
+},{}]},{},[156,1], null)
+//# sourceMappingURL=/index.map

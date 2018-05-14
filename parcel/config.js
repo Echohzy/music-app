@@ -8,7 +8,7 @@ var file = Path.join(__dirname, '../src/javascripts/index.js');
 var options = {
   outDir: './public', // 将生成的文件放入输出目录下，默认为 dist
   outFile: 'index', // 输出文件的名称
-  publicUrl: '../src', // 静态资源的 url ，默认为 dist
+  publicUrl: '/', // 静态资源的 url ，默认为 dist
   watch: true, // 是否需要监听文件并在发生改变时重新编译它们，默认为 process.env.NODE_ENV !== 'production'
   cache: false, // 启用或禁用缓存，默认为 true
   cacheDir: '.cache', // 存放缓存的目录，默认为 .cache
