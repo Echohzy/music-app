@@ -10232,6 +10232,7 @@ exports.default = {
 //
 //
 //
+//
       var $131bb7 = exports.default || module.exports;
       if (typeof $131bb7 === 'function') {
         $131bb7 = $131bb7.options;
@@ -10246,7 +10247,13 @@ exports.default = {
   return _c(
     "div",
     { attrs: { id: "app" } },
-    [_c("Header"), _vm._v(" "), _c("router-view", { staticClass: "view" })],
+    [
+      _c("Header"),
+      _vm._v(" "),
+      _c("router-view", { staticClass: "view" }),
+      _vm._v(" "),
+      _c("div", { attrs: { id: "notification-container" } })
+    ],
     1
   )
 }
@@ -14925,18 +14932,36 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 exports.default = {
     name: "SignIn",
+    data: function data() {
+        return {
+            email: "",
+            password: ""
+        };
+    },
     methods: {
         addNotification: function addNotification(status) {
             var n = new _vue2.default({
-                render: function render(c) {
-                    return c(_notification2.default, { props: { status: status, message: status } });
+                render: function render(createElement) {
+                    return createElement(_notification2.default, { props: { status: status, message: status } });
                 }
             }).$mount();
             document.getElementById("notification-container").appendChild(n.$el);
-        }
+        },
+        onInputValueChange: function onInputValueChange(attr, value) {
+            this[attr] = value;
+        },
+        onFormSubmit: function onFormSubmit() {}
     }
 };
       var $b6dee9 = exports.default || module.exports;
@@ -14951,41 +14976,78 @@ exports.default = {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "sign-in-container" }, [
-    _c("div", { attrs: { id: "notification-container" } }),
-    _vm._v(" "),
     _c(
-      "button",
+      "form",
       {
         on: {
-          click: function($event) {
-            _vm.addNotification("error")
+          submit: function($event) {
+            $event.preventDefault()
+            return _vm.onFormSubmit($event)
           }
         }
       },
-      [_vm._v("Add Error Notification")]
-    ),
-    _vm._v(" "),
-    _c(
-      "button",
-      {
-        on: {
-          click: function($event) {
-            _vm.addNotification("success")
-          }
-        }
-      },
-      [_vm._v("Add Success Notification")]
+      [
+        _c("div", { staticClass: "form-group" }, [
+          _c("input", {
+            staticClass: "input",
+            attrs: {
+              type: "email",
+              required: "",
+              name: "email",
+              placeholder: "Please input email"
+            },
+            domProps: { value: _vm.email },
+            on: {
+              change: function($event) {
+                _vm.onInputValueChange("email", $event.target.value)
+              }
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group" }, [
+          _c("input", {
+            staticClass: "input",
+            attrs: {
+              type: "password",
+              required: "",
+              name: "password",
+              placeholder: "Please input password"
+            },
+            domProps: { value: _vm.password },
+            on: {
+              change: function($event) {
+                _vm.onInputValueChange("password", $event.target.value)
+              }
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _vm._m(0)
+      ]
     )
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("input", {
+        staticClass: "submit-button",
+        attrs: { type: "submit", value: "Sign In" }
+      })
+    ])
+  }
+]
 render._withStripped = true
 
           return {
             render: render,
             staticRenderFns: staticRenderFns,
             _compiled: true,
-            _scopeId: null,
+            _scopeId: "data-v-b6dee9",
             functional: undefined
           };
         })());
@@ -15099,7 +15161,7 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register(window.location.origin + "/sw.js", { scope: "/" }).then(function (registration) {}).catch(function (error) {});
   });
 }
-},{"vue":19,"vue-router":21,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/topiclist.vue":15,"./components/home_container.vue":17,"./components/sign_in.vue":158,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],204:[function(require,module,exports) {
+},{"vue":19,"vue-router":21,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/topiclist.vue":15,"./components/home_container.vue":17,"./components/sign_in.vue":158,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],245:[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -15269,5 +15331,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},[204,1], null)
+},{}]},{},[245,1], null)
 //# sourceMappingURL=/index.map

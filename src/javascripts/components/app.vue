@@ -2,6 +2,7 @@
   <div id="app">
     <Header />
     <router-view class="view"></router-view>
+    <div id="notification-container"></div>
   </div>
 </template>
 <script>

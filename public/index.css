@@ -393,14 +393,40 @@ aduio[data-v-1e008b]{
 }
 .notification-enter[data-v-18fa33], .notification-leave-to[data-v-18fa33] {
   opacity: 0;
-}@charset "UTF-8";
-html {
+}
+.sign-in-container[data-v-b6dee9]{
+    padding: 100px 50px 0;
+    text-align: center;
+    box-sizing:border-box;
+    min-height: calc( 100% - 44px );
+    background: #bfc8dc;
+}
+.form-group[data-v-b6dee9]{
+    margin-bottom: 40px;
+    font-size: 14px;
+}
+.form-group .input[data-v-b6dee9]{
+    line-height: 40px;
+    box-sizing: border-box;
+    padding: 0 10px;
+    width: 100%;
+    border: 1px solid #818FAF;
+}
+.submit-button[data-v-b6dee9]{
+    border: none;
+    background: #4c5475;
+    color: #fff;
+    font-size: 14px;
+    line-height: 40px;
+    border-radius: 4px;
+    width: 100%;
+}html {
   overflow-y: scroll; }
 
 body {
   margin: 0;
   padding: 0;
-  font: 12px "宋体", sans-serif;
+  font: 12px "Monaco", "Microsoft YaHei",  sans-serif;
   background: #fdfdfd; }
 
 div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, blockquote, p {
