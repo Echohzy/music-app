@@ -14950,10 +14950,10 @@ exports.default = {
         };
     },
     methods: {
-        addNotification: function addNotification(status) {
+        addNotification: function addNotification(status, message) {
             var n = new _vue2.default({
                 render: function render(createElement) {
-                    return createElement(_notification2.default, { props: { status: status, message: status } });
+                    return createElement(_notification2.default, { props: { status: status, message: message } });
                 }
             }).$mount();
             document.getElementById("notification-container").appendChild(n.$el);
@@ -14961,7 +14961,25 @@ exports.default = {
         onInputValueChange: function onInputValueChange(attr, value) {
             this[attr] = value;
         },
-        onFormSubmit: function onFormSubmit() {}
+        onFormSubmit: function onFormSubmit() {
+            var _this = this;
+
+            if (navigator.credentials) {
+                var cred = new PasswordCredential({
+                    id: Date.now(),
+                    name: this.email,
+                    password: this.password
+                });
+                var p = navigator.credentials.store(cred).then(function () {
+                    _this.addNotification("success", "Login successfully!");
+                    _this.$router.push("/home");
+                }).catch(function (error) {
+                    _this.addNotification("error", "Logon fails!");
+                });
+            } else {
+                this.$router.push("/home");
+            }
+        }
     }
 };
       var $b6dee9 = exports.default || module.exports;
@@ -15161,7 +15179,7 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register(window.location.origin + "/sw.js", { scope: "/" }).then(function (registration) {}).catch(function (error) {});
   });
 }
-},{"vue":19,"vue-router":21,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/topiclist.vue":15,"./components/home_container.vue":17,"./components/sign_in.vue":158,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],245:[function(require,module,exports) {
+},{"vue":19,"vue-router":21,"./components/app.vue":7,"./components/home.vue":9,"./components/toplist.vue":11,"./components/search.vue":13,"./components/topiclist.vue":15,"./components/home_container.vue":17,"./components/sign_in.vue":158,"../stylesheets/style.scss":3,"../stylesheets/iconfont.scss":5}],252:[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -15331,5 +15349,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},[245,1], null)
+},{}]},{},[252,1], null)
 //# sourceMappingURL=/index.map

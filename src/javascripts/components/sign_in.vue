@@ -25,10 +25,10 @@
             };
         },
         methods: {
-            addNotification: function(status){
+            addNotification: function(status, message){
                 var n = new Vue({
                     render: function(createElement){
-                        return createElement(Notification,{props: {status: status, message: status } });
+                        return createElement(Notification,{props: {status: status, message: message } });
                     }
                 }).$mount();
                 document.getElementById("notification-container").appendChild(n.$el);
@@ -37,7 +37,21 @@
                 this[attr] = value;
             },
             onFormSubmit: function(){
-                
+                if(navigator.credentials) {
+                    var cred = new PasswordCredential({
+                        id: Date.now(),
+                        name: this.email,
+                        password: this.password
+                    });
+                    var  p = navigator.credentials.store(cred).then(()=>{
+                        this.addNotification("success", "Login successfully!")
+                        this.$router.push("/home");
+                    }).catch((error)=>{
+                        this.addNotification("error", "Logon fails!");
+                    });
+                }else{
+                    this.$router.push("/home");
+                }
             } 
         }
     };
